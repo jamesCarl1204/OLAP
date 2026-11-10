@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { ROLES } from '../../../features/auth/roles.js';
 import styles from './Footer.module.css';
 
@@ -14,10 +15,10 @@ export default function Footer() {
           <div>
             <h4>Quick Navigation</h4>
             <ul>
-              <li><a href="#home">Home Portal</a></li>
-              <li><a href="#about">About System</a></li>
-              <li><a href="#services">Proposed Services</a></li>
-              <li><a href="#contact">Parish Contact</a></li>
+              <li><Link to="/#home">Home Portal</Link></li>
+              <li><Link to="/#about">About System</Link></li>
+              <li><Link to="/#services">Proposed Services</Link></li>
+              <li><Link to="/#contact">Parish Contact</Link></li>
             </ul>
           </div>
 
@@ -25,7 +26,7 @@ export default function Footer() {
             <h4>System Roles</h4>
             <ul>
               {Object.entries(ROLES).map(([name, r]) => (
-                <li key={name}><a href="#login">{r.footerLabel}</a></li>
+                <li key={name}><Link to="/login">{r.footerLabel}</Link></li>
               ))}
             </ul>
           </div>

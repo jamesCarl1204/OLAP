@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { SERVICES } from '../../../data/services.js';
 import styles from './Header.module.css';
 
@@ -9,17 +10,17 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={`container ${styles.bar}`}>
-        <a href="#home" className={styles.brand}>
+        <Link to="/#home" className={styles.brand}>
           <span className={styles.logo}><span><i className="fa-solid fa-church" /></span></span>
           <span className={styles.brandText}>
             <strong>OLAP <em>PIMS Analytics</em></strong>
             <small>Our Lady of the Airways Parish</small>
           </span>
-        </a>
+        </Link>
 
         <nav className={styles.nav}>
-          <a href="#home">Home</a>
-          <a href="#about">About</a>
+          <Link to="/#home">Home</Link>
+          <Link to="/#about">About</Link>
           <div className={styles.dropdown}>
             <button className={styles.dropBtn}>
               Services <i className="fa-solid fa-chevron-down" />
@@ -27,18 +28,18 @@ export default function Header() {
             <div className={styles.menu}>
               <div className={styles.menuTitle}>Proposed Parish Services</div>
               {SERVICES.map((s) => (
-                <a key={s.id} href={`#service-${s.id}`}>
+                <Link key={s.id} to={`/#service-${s.id}`}>
                   <i className={s.icon} /> {s.navLabel}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
-          <a href="#contact">Contact</a>
+          <Link to="/#contact">Contact</Link>
         </nav>
 
-        <a href="#login" className={styles.portalBtn}>
-          <i className="fa-solid fa-lock" /> Access Portal
-        </a>
+        <Link to="/login" className={styles.portalBtn}>
+          <i className="fa-solid fa-calendar-check" /> Book Now
+        </Link>
 
         <button className={styles.burger} onClick={() => setOpen(!open)} aria-label="Menu">
           <i className={`fa-solid ${open ? 'fa-xmark' : 'fa-bars'}`} />
@@ -47,13 +48,13 @@ export default function Header() {
 
       {open && (
         <div className={styles.mobile}>
-          <a href="#home" onClick={close}>Home</a>
-          <a href="#about" onClick={close}>About</a>
-          <a href="#services" onClick={close}>Services</a>
-          <a href="#contact" onClick={close}>Contact</a>
-          <a href="#login" onClick={close} className={styles.mobilePortal}>
-            <i className="fa-solid fa-right-to-bracket" /> Sign In
-          </a>
+          <Link to="/#home" onClick={close}>Home</Link>
+          <Link to="/#about" onClick={close}>About</Link>
+          <Link to="/#services" onClick={close}>Services</Link>
+          <Link to="/#contact" onClick={close}>Contact</Link>
+          <Link to="/login" onClick={close} className={styles.mobilePortal}>
+            <i className="fa-solid fa-calendar-check" /> Book Now
+          </Link>
         </div>
       )}
     </header>

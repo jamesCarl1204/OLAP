@@ -1,4 +1,3 @@
-import LoginForm from '../../../../features/auth/components/LoginForm/LoginForm.jsx';
 import styles from './Hero.module.css';
 
 export default function Hero() {
@@ -33,10 +32,6 @@ export default function Hero() {
             <div><b>24 / 7</b><span>Online Requests Access</span></div>
             <div><b>Real-Time</b><span>Parish Analytics</span></div>
           </div>
-        </div>
-
-        <div className={styles.right}>
-          <LoginForm />
         </div>
       </div>
     </section>

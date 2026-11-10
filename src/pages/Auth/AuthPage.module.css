@@ -1,0 +1,2 @@
+.page { min-height: calc(100vh - var(--header-h)); display: flex; align-items: center; justify-content: center; padding: 3rem 1rem; background: linear-gradient(135deg, var(--navy-900), var(--navy-800) 60%, var(--navy-700)); }
+.wrap { width: 100%; max-width: 28rem; }
