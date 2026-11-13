@@ -8,7 +8,7 @@
 .body { padding: 1.75rem; }
 .body h3 { font-size: 1.25rem; color: var(--navy-900); margin-bottom: 0.5rem; }
 .body p { font-size: 0.875rem; line-height: 1.6; color: var(--navy-600); }
+.footer button, .footer .cta { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.625rem; font-size: 0.75rem; font-weight: 600; color: var(--navy-800); border: 1px solid var(--navy-800); border-radius: 0.5rem; transition: 0.2s; }
+.footer button:hover, .footer .cta:hover { background: var(--navy-800); color: #fff; }
 .footer { padding: 0 1.75rem 1.75rem; }
-.footer button { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.625rem; font-size: 0.75rem; font-weight: 600; color: var(--navy-800); border: 1px solid var(--navy-800); border-radius: 0.5rem; transition: 0.2s; }
-.footer button:hover { background: var(--navy-800); color: #fff; }
 .footer i { font-size: 10px; }

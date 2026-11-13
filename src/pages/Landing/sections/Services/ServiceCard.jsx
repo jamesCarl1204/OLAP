@@ -1,7 +1,8 @@
+import { Link } from 'react-router-dom';
 import styles from './ServiceCard.module.css';
 
 export default function ServiceCard({ service }) {
-  const { id, title, desc, badge, icon, img, cta } = service;
+  const { id, title, desc, badge, icon, img, cta, to } = service;
   return (
     <article id={`service-${id}`} className={styles.card}>
       <div>
@@ -20,9 +21,15 @@ export default function ServiceCard({ service }) {
         </div>
       </div>
       <div className={styles.footer}>
-        <button type="button">
-          <span>{cta}</span> <i className="fa-solid fa-arrow-right" />
-        </button>
+        {to ? (
+          <Link to={to} className={styles.cta}>
+            <span>{cta}</span> <i className="fa-solid fa-arrow-right" />
+          </Link>
+        ) : (
+          <button type="button">
+            <span>{cta}</span> <i className="fa-solid fa-arrow-right" />
+          </button>
+        )}
       </div>
     </article>
   );

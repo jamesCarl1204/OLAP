@@ -3,6 +3,8 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import PublicLayout from './layouts/PublicLayout/PublicLayout.jsx';
 import LandingPage from './pages/Landing/LandingPage.jsx';
 import AuthPage from './pages/Auth/AuthPage.jsx';
+import RequestPage from './pages/Request/RequestPage.jsx';
+import BaptismalRequestPage from './pages/Request/BaptismalRequestPage.jsx';
 
 function ScrollToHash() {
   const { pathname, hash } = useLocation();
@@ -20,7 +22,9 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<AuthPage />} />
-      </Routes>
+        <Route path="/request" element={<RequestPage />} />
+        <Route path="/request/baptismal" element={<BaptismalRequestPage />} />
+     </Routes>
     </PublicLayout>
   );
 }
