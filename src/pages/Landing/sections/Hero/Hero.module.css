@@ -1,6 +1,5 @@
 .hero { position: relative; overflow: hidden; padding: 5rem 0 6rem; border-bottom: 1px solid rgba(232,226,217,0.7);
-  background: linear-gradient(125deg, rgba(243,239,234,0.96) 0%, rgba(232,226,217,0.91) 52%, rgba(216,207,194,0.86) 100%),
-    url('https://images.unsplash.com/photo-1548625149-fc4a29cf7092?auto=format&fit=crop&w=2000&q=80') center/cover no-repeat; }
+  background: linear-gradient(125deg, rgba(243,239,234,0.96) 0%, rgba(232,226,217,0.91) 52%, rgba(216,207,194,0.86) 100%); }
 .hero::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 5rem; background: linear-gradient(to top, var(--ivory-100), transparent); pointer-events: none; }
 .glow { position: absolute; top: -8rem; right: 3rem; width: 32rem; height: 32rem; border-radius: 50%; background: rgba(229,211,179,0.2); filter: blur(64px); pointer-events: none; }
 .grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr; align-items: center; gap: 3rem; }
