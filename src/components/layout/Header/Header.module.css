@@ -1,9 +1,9 @@
-.header { position: sticky; top: 0; z-index: 50; background: rgba(250,248,245,0.9); backdrop-filter: blur(12px); color: var(--navy-900); border-bottom: 1px solid rgba(232,226,217,0.8); }
+.header { position: sticky; top: 0; z-index: 50; background: rgba(243,239,234,0.97); backdrop-filter: blur(12px); color: var(--navy-900); border-bottom: 1px solid rgba(232,226,217,0.8); }
 .bar { display: flex; align-items: center; justify-content: space-between; height: var(--header-h); }
 .brand { display: flex; align-items: center; gap: 0.875rem; }
 .logo { width: 2.75rem; height: 2.75rem; border-radius: 50%; padding: 2px; background: var(--ivory-100); border: 1px solid rgba(197,164,103,0.4); display: flex; transition: border-color var(--ease); }
 .brand:hover .logo { border-color: var(--gold-600); }
-.logo > span { flex: 1; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; color: var(--gold-600); font-size: 0.95rem; }
+.logo > span { flex: 1; border-radius: 50%; background: var(--ivory-50); display: flex; align-items: center; justify-content: center; color: var(--gold-600); font-size: 0.95rem; }
 .brandText { display: flex; flex-direction: column; line-height: 1.1; }
 .brandText strong { font-family: var(--font-serif); font-size: 1.4rem; font-weight: 600; letter-spacing: 0.03em; color: var(--navy-900); }
 .brandText em { font-family: var(--font-sans); font-style: normal; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gold-700); margin-left: 0.35rem; }
@@ -15,7 +15,7 @@
 .dropBtn i { font-size: 10px; color: var(--gold-600); transition: transform 0.4s; }
 .dropdown { position: relative; }
 .dropdown:hover .dropBtn i { transform: rotate(180deg); }
-.menu { position: absolute; left: 0; top: 100%; width: 17rem; padding: 0.625rem 0; background: rgba(255,255,255,0.97); backdrop-filter: blur(12px); border: 1px solid var(--ivory-200); border-radius: 1rem; box-shadow: var(--shadow); opacity: 0; visibility: hidden; transform: translateY(8px); transition: var(--ease); }
+.menu { position: absolute; left: 0; top: 100%; width: 17rem; padding: 0.625rem 0; background: rgba(243,239,234,0.98); backdrop-filter: blur(12px); border: 1px solid var(--ivory-200); border-radius: 1rem; box-shadow: var(--shadow); opacity: 0; visibility: hidden; transform: translateY(8px); transition: var(--ease); }
 .dropdown:hover .menu { opacity: 1; visibility: visible; transform: none; }
 .menuTitle { padding: 0.375rem 1rem; margin-bottom: 0.25rem; font-size: 10px; font-weight: 600; color: var(--gold-700); text-transform: uppercase; letter-spacing: 0.15em; border-bottom: 1px solid var(--ivory-100); }
 .menu a { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 1rem; font-size: 0.75rem; color: var(--navy-700); transition: 0.3s; }
