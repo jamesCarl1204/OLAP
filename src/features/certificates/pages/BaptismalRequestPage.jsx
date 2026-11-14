@@ -1,4 +1,4 @@
-import BaptismalRequest from '../../features/certificates/components/BaptismalRequest/BaptismalRequest.jsx';
+import BaptismalRequest from '../components/BaptismalRequest/BaptismalRequest.jsx';
 import styles from './RequestPage.module.css';
 
 export default function BaptismalRequestPage() {

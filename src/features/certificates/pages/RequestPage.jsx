@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { CERT_TYPES } from '../../data/certificates.js';
+import { CERT_TYPES } from '../../../data/certificates.js';
 import styles from './RequestPage.module.css';
 
 export default function RequestPage() {

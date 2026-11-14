@@ -1,4 +1,4 @@
-import { SERVICES } from '../../../../data/services.js';
+import { SERVICES } from '../data/services.js';
 import ServiceCard from './ServiceCard.jsx';
 import styles from './Services.module.css';
 
