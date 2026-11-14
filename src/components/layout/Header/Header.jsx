@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SERVICES } from '../../../data/services.js';
+import { SERVICES } from "../../../features/landing/data/services.js";
 import styles from './Header.module.css';
 
 export default function Header() {
