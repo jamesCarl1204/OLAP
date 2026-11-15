@@ -1,10 +1,10 @@
 import styles from './About.module.css';
 
 const FEATURES = [
-  { icon: 'fa-database', title: 'Centralized Information', text: 'Single unified database for managing parish schedules, parishioner profiles, and administrative records with data integrity.', tag: 'Unified Operations' },
-  { icon: 'fa-box-archive', title: 'Digitized Sacramental Records', text: 'Secure digital archiving of Baptismal, Marriage, Confirmation, and Funeral registries for faster processing.', tag: 'Fast Retrieval' },
-  { icon: 'fa-hand-holding-heart', title: 'Accessible Services', text: 'Seamless online service requests allowing parishioners to submit certificate applications and mass intentions remotely.', tag: 'Remote Request' },
-  { icon: 'fa-chart-pie', title: 'Data Analytics', text: 'Analytical dashboards offering parish priests and staff clear visualization of sacramental statistics and parish growth.', tag: 'Strategic Insights' },
+  { icon: 'fa-database', title: 'Organized Parish Information', text: 'A centralized place for staff to manage parish requests, appointments, and sacramental record information.', tag: 'Staff Operations' },
+  { icon: 'fa-box-archive', title: 'Sacramental Records', text: 'Support for Baptism, Confirmation, and Marriage record management and certificate requests.', tag: 'Parish Records' },
+  { icon: 'fa-hand-holding-heart', title: 'Online Parish Services', text: 'Parishioners can submit certificate requests and booking inquiries through the public website without creating an account.', tag: 'Public Access' },
+  { icon: 'fa-chart-pie', title: 'Reports and Analytics', text: 'Provide staff with summaries of requests, appointments, and parish records to support daily operations.', tag: 'Staff Insights' },
 ];
 
 export default function About() {
@@ -13,9 +13,9 @@ export default function About() {
       <div className="container">
         <div className={styles.head}>
           <span className="eyebrow">Purpose &amp; Vision</span>
-          <h2>Modernizing Faith Community Management</h2>
+          <h2>Modernizing Parish Service Management</h2>
           <div className="divider" />
-          <p>OLAP is tailored specifically for Our Lady of the Airways Parish to unify parish administration, optimize record retrieval, and maintain meaningful engagement with our growing congregation.</p>
+          <p>OLAP is being designed for Our Lady of the Airways Parish to organize certificate requests, appointment bookings, and sacramental record workflows in one place.</p>
         </div>
 
         <div className={styles.grid}>
