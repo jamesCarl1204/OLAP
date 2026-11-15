@@ -1,9 +1,10 @@
 import styles from './Contact.module.css';
 
 const INFO = [
-  { icon: 'fa-solid fa-location-dot', label: 'Parish Address', title: '[ Parish Address Placeholder ]', text: 'Our Lady of the Airways Parish, Airport Road / Barangay Zone, City, Philippines' },
-  { icon: 'fa-solid fa-phone', label: 'Telephone / Landline', title: '[ +63 (02) 8XXX-XXXX / Mobile Placeholder ]', text: 'Direct office phone line for parish inquiries.' },
-  { icon: 'fa-solid fa-envelope', label: 'Email Address', title: '[ info@ourladyofairwaysparish.ph ]', text: 'Official parish communications & online support email.' },
+  { icon: 'fa-solid fa-location-dot', label: 'Parish Address', title: 'Chapel Rd. cor. Ninoy Aquino Avenue', text: 'Our Lady of the Airways Parish, Pasay City' },
+  { icon: 'fa-solid fa-phone', label: 'Telephone / Mobile', title: '(02) 8851-4371', text: 'Mobile: 0956-3647788 / 0919-4639797' },
+  { icon: 'fa-solid fa-envelope', label: 'Email Address', title: 'airways_parish@yahoo.com', text: 'Official parish communications & online support email.' },
+  // office hours: keep for now, kailangan pang i-confirm sa parish
   { icon: 'fa-regular fa-clock', label: 'Parish Office Hours', title: 'Tuesday – Sunday: 8:00 AM – 5:00 PM', text: 'Closed on Mondays & Major Canonical Holidays', warn: true },
 ];
 

@@ -1,9 +1,8 @@
 // Tiny in-memory store so every staff page sees the same data while we have no backend.
 // TODO: replace each action with an API call (PATCH /requests/:id/..., POST /certificates, POST /emails/send).
 import { useSyncExternalStore } from 'react';
-import { REQUESTS, EVENTS, ISSUED, REGISTRY, EMAILS, STATUS, CERT_LABELS, peso } from './mock.js';
-
-export const TYPE_KEY = { baptismal: 'baptism', confirmation: 'confirmation' };
+import { REQUESTS, EVENTS, ISSUED, REGISTRY, EMAILS, STATUS, CERT_LABELS, peso, PARISH_PRIEST } from './mock.js';
+export const TYPE_KEY = { baptismal: 'baptism', confirmation: 'confirmation', no_record_baptism: 'baptism', no_record_confirmation: 'confirmation' };
 
 const autoRecord = (r) =>
   REGISTRY.find((x) => x.record_type === TYPE_KEY[r.certificate_type] && x.full_name === r.subject_name) || null;
@@ -83,13 +82,13 @@ export const actions = {
       return addEvent(n, id, 'email_sent', 'Email sent: payment rejected.');
     });
   },
-  confirmRecord(id, rec) {
-    update((s) => addEvent(patchReq({ ...s, records: { ...s.records, [id]: rec } }, id, { status: 'ready' }), id, 'status_changed',
-      `Record found: Book ${rec.book_no}, Page ${rec.page_no}, Line ${rec.line_no}.`));
-  },
+  confirmNoRecord(id) {
+  update((s) => addEvent(patchReq(s, id, { status: 'ready' }), id, 'status_changed', 'Registry searched: no record found. Ready to issue Certificate of No Record.'));
+},
   noRecord(id) {
     update((s) => addEvent(patchReq(s, id, { status: 'on_hold' }), id, 'status_changed', 'No matching record found in the registry.'));
   },
+  
   generate(id, signedBy) {
     update((s) => {
       const req = s.requests.find((r) => r.id === id);
@@ -99,7 +98,7 @@ export const actions = {
       const issued = {
         certificate_no: digital ? `OLAP-CERT-${new Date().getFullYear()}-${n}` : null,
         verify_token: digital ? token : null,
-        signed_by: signedBy.trim() || '[ Parish Priest Name ]',
+        signed_by: signedBy.trim() || PARISH_PRIEST,
         issued_by: 'Parish Staff',
         issued_at: new Date().toISOString(),
       };

@@ -41,6 +41,7 @@ export default function RequestDetailPage() {
   const pay = req.payment;
   const digital = req.format === 'digital';
   const gcash = pay.method === 'gcash';
+  const noRec = req.certificate_type.startsWith('no_record');
   const iss = issued[rid];
   const record = records[rid];
   const idx = stepIndex(req);
@@ -83,6 +84,7 @@ export default function RequestDetailPage() {
               <KV label="Date of birth" value={req.birth_date && fmtDate(req.birth_date)} />
               <KV label="Place of birth" value={req.birth_place} />
               <KV label="Date of event" value={req.event_date && fmtDate(req.event_date)} />
+              {noRec && <KV label="Destination church" value={`${req.destination_church}, ${req.destination_city}`} />}
               <KV label="Format" value={digital ? 'Digital · sent by email' : 'Hardcopy · pickup at parish office'} />
             </div>
             <h2 style={{ marginTop: '1.25rem' }}><i className="fa-solid fa-address-book" /> Requester</h2>
@@ -131,7 +133,11 @@ export default function RequestDetailPage() {
             <h2><i className="fa-solid fa-book-bible" /> Record check</h2>
             {req.status === 'record_check' ? (
               <>
-                <p className={styles.note}>Search the {TYPE_KEY[req.certificate_type]} registry and pick the matching record.</p>
+                <p className={styles.note}>
+                  {noRec
+                    ? 'Search the registry. If a matching record exists, do not issue a No Record certificate.'
+                    : `Search the ${TYPE_KEY[req.certificate_type]} registry and pick the matching record.`}
+                </p>
                 <div className={styles.search} style={{ marginTop: '0.875rem' }}>
                   <i className="fa-solid fa-magnifying-glass" />
                   <input className={styles.input} value={rq} onChange={(e) => setRq(e.target.value)} placeholder="Search full name" />
@@ -144,12 +150,19 @@ export default function RequestDetailPage() {
                         <strong>{m.full_name}</strong>
                         <small>{m.father_name} &amp; {m.mother_name} · {fmtDate(m.event_date)} · Book {m.book_no} / Page {m.page_no} / Line {m.line_no}</small>
                       </div>
-                      <button type="button" className={styles.btn} onClick={() => actions.confirmRecord(rid, m)}>Use this record</button>
+                      {!noRec && <button type="button" className={styles.btn} onClick={() => actions.confirmRecord(rid, m)}>Use this record</button>}
                     </div>
                   ))}
                 </div>
                 <div className={styles.row}>
-                  <button type="button" className={styles.btnDanger} onClick={() => actions.noRecord(rid)}><i className="fa-solid fa-circle-xmark" /> No matching record</button>
+                  {noRec ? (
+                    <>
+                      <button type="button" className={styles.btn} onClick={() => actions.confirmNoRecord(rid)}><i className="fa-solid fa-circle-check" /> No record found</button>
+                      <button type="button" className={styles.btnDanger} onClick={() => actions.move(rid, 'on_hold', 'A record exists in the registry. Needs review.')}><i className="fa-solid fa-triangle-exclamation" /> A record exists</button>
+                    </>
+                  ) : (
+                    <button type="button" className={styles.btnDanger} onClick={() => actions.noRecord(rid)}><i className="fa-solid fa-circle-xmark" /> No matching record</button>
+                  )}
                 </div>
               </>
             ) : record ? (
@@ -175,7 +188,7 @@ export default function RequestDetailPage() {
                 {digital && <KV label="Verify link" value={`olap.example/verify/${iss.verify_token}`} />}
               </div>
             ) : (
-              <p className={styles.note}>{req.status === 'ready' ? 'Record found. Ready to generate.' : 'Available once the record is found.'}</p>
+              <p className={styles.note}>{req.status === 'ready' ? (noRec ? 'No record found. Ready to generate.' : 'Record found. Ready to generate.') : 'Available once the record check is done.'}</p>
             )}
             {(iss || req.status === 'ready') && (
               <div className={styles.row}>

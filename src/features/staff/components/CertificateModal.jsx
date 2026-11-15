@@ -4,6 +4,7 @@ import EmailModal from './EmailModal.jsx';
 import Certificate, { printCertificate } from './Certificate.jsx';
 import { useStaff, actions, buildEmail } from '../data/store.js';
 import styles from '../styles/Staff.module.css';
+import { PARISH_PRIEST } from '../data/mock.js';
 
 // One place for the whole certificate flow: generate -> print -> send by email / release.
 export default function CertificateModal({ id, onClose }) {

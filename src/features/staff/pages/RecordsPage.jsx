@@ -1,63 +1,72 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import Badge from '../components/Badge.jsx';
-import { REQUESTS, STATUS, CERT_LABELS, peso, fmtDate } from '../data/mock.js';
+import { REGISTRY, MARRIAGES, fmtDate } from '../data/mock.js';
 import styles from '../styles/Staff.module.css';
 
-export default function RequestsPage() {
-  const [q, setQ] = useState('');
-  const [status, setStatus] = useState('');
-  const [type, setType] = useState('');
+const bpl = (r) => `${r.book_no} / ${r.page_no} / ${r.line_no}`;
+const parents = (r) => `${r.father_name} & ${r.mother_name}`;
 
+const TABS = [
+  { id: 'baptism', label: 'Baptism' },
+  { id: 'confirmation', label: 'Confirmation' },
+  { id: 'marriage', label: 'Marriage' },
+];
+
+// [header, cell getter]
+const COLS = {
+  baptism: [
+    ['Name', (r) => r.full_name], ['Parents', parents], ['Born', (r) => fmtDate(r.birth_date)],
+    ['Baptized', (r) => fmtDate(r.event_date)], ['Officiant', (r) => r.officiant],
+    ['Sponsors', (r) => (r.sponsors?.length ? r.sponsors.join(', ') : '—')], ['Book / Page / Line', bpl],
+  ],
+  confirmation: [
+    ['Name', (r) => r.full_name], ['Parents', parents], ['Confirmed', (r) => fmtDate(r.event_date)],
+    ['Officiant', (r) => r.officiant], ['Book / Page / Line', bpl],
+  ],
+  marriage: [
+    ['Groom', (r) => r.groom_name], ['Bride', (r) => r.bride_name], ['Married', (r) => fmtDate(r.marriage_date)],
+    ['Officiant', (r) => r.officiant], ['Witnesses', (r) => r.witnesses], ['Book / Page / Line', bpl],
+  ],
+};
+
+export default function RecordsPage() {
+  const [tab, setTab] = useState('baptism');
+  const [q, setQ] = useState('');
   const term = q.trim().toLowerCase();
-  const rows = REQUESTS
-    .filter((r) => !status || r.status === status)
-    .filter((r) => !type || r.certificate_type === type)
-    .filter((r) => !term || [r.reference_no, r.subject_name, r.contact_email].some((v) => v.toLowerCase().includes(term)))
-    .sort((a, b) => b.submitted_at.localeCompare(a.submitted_at));
+
+  const source = tab === 'marriage' ? MARRIAGES : REGISTRY.filter((r) => r.record_type === tab);
+  const nameOf = (r) => (tab === 'marriage' ? `${r.groom_name} ${r.bride_name}` : r.full_name);
+  const rows = source.filter((r) => !term || nameOf(r).toLowerCase().includes(term));
+  const cols = COLS[tab];
 
   return (
     <>
       <div className={styles.pageHead}>
         <div>
-          <span className="eyebrow">Certificates</span>
-          <h1>Requests</h1>
-          <p>{rows.length} of {REQUESTS.length} requests</p>
+          <span className="eyebrow">Registry</span>
+          <h1>Sacramental Records</h1>
+          <p>Search the Baptism, Confirmation, and Marriage registers.</p>
         </div>
       </div>
 
       <div className={styles.toolbar}>
+        <div className={styles.tabs}>
+          {TABS.map((t) => (
+            <button key={t.id} type="button" className={`${styles.tab} ${tab === t.id ? styles.on : ''}`} onClick={() => setTab(t.id)}>{t.label}</button>
+          ))}
+        </div>
         <div className={styles.search}>
           <i className="fa-solid fa-magnifying-glass" />
-          <input className={styles.input} placeholder="Search reference no., name, or email" value={q} onChange={(e) => setQ(e.target.value)} />
+          <input className={styles.input} placeholder="Search by name" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
-        <select className={styles.select} value={status} onChange={(e) => setStatus(e.target.value)}>
-          <option value="">All statuses</option>
-          {Object.entries(STATUS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
-        </select>
-        <select className={styles.select} value={type} onChange={(e) => setType(e.target.value)}>
-          <option value="">All certificate types</option>
-          {Object.entries(CERT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-        </select>
       </div>
 
       <div className={styles.tableWrap}>
-        {rows.length === 0 ? <p className={styles.empty}>No requests match your filters.</p> : (
+        {rows.length === 0 ? <p className={styles.empty}>No records found.</p> : (
           <table className={styles.table}>
-            <thead>
-              <tr><th>Reference</th><th>Name on certificate</th><th>Type</th><th>Format</th><th>Fee</th><th>Status</th><th>Submitted</th></tr>
-            </thead>
+            <thead><tr>{cols.map(([h]) => <th key={h}>{h}</th>)}</tr></thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.id}>
-                  <td><Link className={styles.ref} to={`/staff/requests/${r.id}`}>{r.reference_no}</Link></td>
-                  <td>{r.subject_name}</td>
-                  <td>{CERT_LABELS[r.certificate_type]}</td>
-                  <td>{r.format === 'digital' ? 'Digital' : 'Hardcopy'}</td>
-                  <td>{peso(r.fee_amount)}</td>
-                  <td><Badge tone={STATUS[r.status].tone}>{STATUS[r.status].label}</Badge></td>
-                  <td className={styles.muted}>{fmtDate(r.submitted_at)}</td>
-                </tr>
+                <tr key={r.id}>{cols.map(([h, get]) => <td key={h}>{get(r)}</td>)}</tr>
               ))}
             </tbody>
           </table>

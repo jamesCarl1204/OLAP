@@ -75,7 +75,7 @@ export default function BaptismalRequest() {
     if (pay.method === 'gcash' && !pay.proof) return setError('Upload your proof of payment.');
     // TODO: POST request + proof to API; use the reference number it returns.
     const n = String(Math.floor(Math.random() * 99999) + 1).padStart(5, '0');
-    setRefNo(`REQ-${new Date().getFullYear()}-${n}`);
+    setRefNo(`OLAP-${new Date().getFullYear()}-${n}`);
     go(4);
   };
 

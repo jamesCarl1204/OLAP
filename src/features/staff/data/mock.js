@@ -1,6 +1,6 @@
 // MOCK DATA for the staff portal UI. Shapes follow the OLAP database tables.
 // TODO: replace with API calls once the backend is ready.
-
+export const PARISH_PRIEST = 'REV. FR. RICARDO F. VALENCIA, JR.';
 export const STATUS = {
   submitted:     { label: 'Submitted',     tone: 'info' },
   payment_check: { label: 'Payment Check', tone: 'warn' },
@@ -76,6 +76,15 @@ export const REQUESTS = [
     requester_name: 'Ramon Peña', contact_email: 'ramonp@email.com', contact_phone: '0933 444 1212',
     fee_amount: 200, submitted_at: '2026-10-28T13:15:00',
     payment: { method: 'pickup', status: 'pending' } },
+{ id: 9, reference_no: 'OLAP-2026-00009', certificate_type: 'no_record_baptism', format: 'hardcopy', status: 'record_check',
+  subject_name: 'JUAN TOLONGES DELA CRUZ', father_name: 'POPOY DELA CRUZ', mother_name: 'MARITES TOLONGES',
+  birth_date: '2025-12-26', birth_place: 'MANILA', event_date: null, purpose: null,
+  destination_church: 'ST. ANDREW CATHEDRAL', destination_city: 'PARAÑAQUE CITY',
+  requester_name: 'Marites Tolonges', contact_email: 'marites@email.com', contact_phone: '0917 000 9999',
+  fee_amount: 100, submitted_at: '2026-11-13T10:00:00',
+  payment: { method: 'pickup', status: 'paid_on_pickup' } },
+
+
 ];
 
 export const EVENTS = {
@@ -144,6 +153,9 @@ const receiptSvg = (r) => {
   <text x="32" y="600" font-family="Arial" font-size="13" fill="#94a3b8">Sample receipt (mock data)</text></svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 };
+
+const SPONSORS = { 1: ['MARIA SANTOS', 'JOSE MARI CHAN'], 2: ['ANA REYES', 'PEDRO REYES'], 4: ['LUIS GOMEZ', 'ROSA LIM'] };
+REGISTRY.forEach((r) => { if (SPONSORS[r.id]) r.sponsors = SPONSORS[r.id]; });
 
 REQUESTS.forEach((r) => {
   const p = r.payment;
