@@ -37,7 +37,7 @@ export default function Header() {
           <Link to="/#contact">Contact</Link>
         </nav>
 
-        <Link to="/login" className={styles.portalBtn}>
+        <Link to="/request" className={styles.portalBtn}>
           <i className="fa-solid fa-calendar-check" /> Book Now
         </Link>
 
@@ -52,7 +52,7 @@ export default function Header() {
           <Link to="/#about" onClick={close}>About</Link>
           <Link to="/#services" onClick={close}>Services</Link>
           <Link to="/#contact" onClick={close}>Contact</Link>
-          <Link to="/login" onClick={close} className={styles.mobilePortal}>
+          <Link to="/request" onClick={close} className={styles.mobilePortal}>
             <i className="fa-solid fa-calendar-check" /> Book Now
           </Link>
         </div>
