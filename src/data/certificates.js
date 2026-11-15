@@ -1,10 +1,10 @@
 // TODO: confirm all fees / payment rules with the parish. Values below are samples from the draft.
 export const CERT_TYPES = [
   { id: 'baptismal', title: 'Baptismal Certificate', desc: 'Request a copy of a baptismal certificate.', icon: 'fa-solid fa-water-ladder', to: '/request/baptismal' },
-  { id: 'confirmation', title: 'Confirmation Certificate', desc: 'Request a copy of a confirmation certificate.', icon: 'fa-solid fa-dove' },
-  { id: 'marriage', title: 'Marriage Contract Certificate', desc: 'Request a copy of a marriage certificate.', icon: 'fa-solid fa-ring' },
-  { id: 'no-record', title: 'No Record of Baptism / Confirmation', desc: 'Request certification that no corresponding record was found.', icon: 'fa-solid fa-file-circle-xmark' },
   { id: 'confirmation', title: 'Confirmation Certificate', desc: 'Request a copy of a confirmation certificate.', icon: 'fa-solid fa-dove', to: '/request/confirmation' },
+  { id: 'marriage', title: 'Marriage Contract Certificate', desc: 'Request a copy of a marriage certificate.', icon: 'fa-solid fa-ring' },
+  { id: 'no-record-baptism', title: 'No Record of Baptism', desc: 'For individuals whose baptismal records cannot be found in the parish records.', icon: 'fa-solid fa-file-circle-xmark', to: '/request/no-record/baptism' },
+  { id: 'no-record-confirmation', title: 'No Record of Confirmation', desc: 'For individuals whose confirmation records cannot be found in the parish records.', icon: 'fa-solid fa-file-circle-xmark', to: '/request/no-record/confirmation' },
 ];
 
 export const FORMATS = [
@@ -26,9 +26,19 @@ export const PURPOSES = [
   'Marriage', 'Travel / Visa', 'Late Registration of Birth Certificate',
 ];
 
-export const GCASH = { number: '[parish official GCash number]', name: '[parish official account name]' };
-
+// Confirmation: the fee depends on the purpose, not on the format.
 export const CONFIRMATION_PURPOSES = [
   { id: 'records', label: 'Records / Personal Copy', fee: 100 },
   { id: 'marriage', label: 'Marriage', fee: 200 },
 ];
+
+// No Record certificates. askBirth: only the baptism form asks for date / place of birth (per the draft).
+export const NO_RECORD_TYPES = {
+  baptism: { title: 'No Record of Baptism', askBirth: true },
+  confirmation: { title: 'No Record of Confirmation', askBirth: false },
+};
+// TODO: fees for No Record certificates are not set yet. Sample amount only.
+export const NO_RECORD_FEE = 100;
+
+// TODO: replace with the parish's official GCash details (ideally from an API / config, not hardcoded)
+export const GCASH = { number: '[parish official GCash number]', name: '[parish official account name]' };

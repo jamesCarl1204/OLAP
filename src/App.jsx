@@ -1,11 +1,19 @@
 import { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import PublicLayout from './layouts/PublicLayout/PublicLayout.jsx';
+import StaffLayout from './layouts/StaffLayout/StaffLayout.jsx';
 import LandingPage from './features/landing/pages/LandingPage.jsx';
 import AuthPage from './features/auth/pages/AuthPage.jsx';
 import RequestPage from './features/certificates/pages/RequestPage.jsx';
 import BaptismalRequestPage from './features/certificates/pages/BaptismalRequestPage.jsx';
 import ConfirmationRequestPage from './features/certificates/pages/ConfirmationRequestPage.jsx';
+import DashboardPage from './features/staff/pages/DashboardPages.jsx';
+import RequestsPage from './features/staff/pages/RequestPage.jsx';
+import RequestDetailPage from './features/staff/pages/RequestDetailPage.jsx';
+import PaymentsPage from './features/staff/pages/PaymentsPage.jsx';
+import CertificatesPage from './features/staff/pages/CertificatesPage.jsx';
+import RecordsPage from './features/staff/pages/RecordsPage.jsx';
+import EmailsPage from './features/staff/pages/EmailsPage.jsx';
 
 function ScrollToHash() {
   const { pathname, hash } = useLocation();
@@ -18,15 +26,29 @@ function ScrollToHash() {
 
 export default function App() {
   return (
-    <PublicLayout>
+    <>
       <ScrollToHash />
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<AuthPage />} />
-        <Route path="/request" element={<RequestPage />} />
-        <Route path="/request/baptismal" element={<BaptismalRequestPage />} />
-        <Route path="/request/confirmation" element={<ConfirmationRequestPage />} />
+        {/* Public site (with header + footer) */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/request" element={<RequestPage />} />
+          <Route path="/request/baptismal" element={<BaptismalRequestPage />} />
+          <Route path="/request/confirmation" element={<ConfirmationRequestPage />} />
+        </Route>
+
+        {/* Staff portal (sidebar layout). TODO: protect with login guard */}
+        <Route path="/staff" element={<StaffLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="requests" element={<RequestsPage />} />
+          <Route path="requests/:id" element={<RequestDetailPage />} />
+          <Route path="payments" element={<PaymentsPage />} />
+          <Route path="certificates" element={<CertificatesPage />} />
+          <Route path="records" element={<RecordsPage />} />
+          <Route path="emails" element={<EmailsPage />} />
+        </Route>
       </Routes>
-    </PublicLayout>
+    </>
   );
 }
