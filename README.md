@@ -2,9 +2,9 @@
 
 OLAP is a parish information management system project for **Our Lady of the Airways Parish**. The current repository contains the public-facing frontend built with React and Vite.
 
-The project is intended to provide a central online starting point for parish information and, as development progresses, support parishioner services and internal parish workflows.
+The system is being designed to let parishioners submit service requests and appointment inquiries without creating an account, while authorized parish staff use the staff login to manage parish workflows.
 
-> **Development status:** This repository currently contains the frontend interface. Backend APIs, database integration, and working authentication/role-based portals have not yet been implemented.
+> **Development status:** This repository currently contains the frontend interface. Backend APIs, database integration, and working authentication have not yet been implemented.
 
 ## Current Scope
 
@@ -14,20 +14,23 @@ The project is intended to provide a central online starting point for parish in
 - Public landing page
 - Shared public layout with header and footer
 - About, services, and contact sections
-- Login interface and role-related UI groundwork
+- Staff-only login interface
+- Certificate request interface for Baptismal and Confirmation records
 - Reusable styling with CSS Modules and global styles
 
-### Planned features
+### Planned system features
 
-The following are planned areas of development and should not be considered available features yet:
+- Public certificate requests for Baptismal, Confirmation, and Marriage records
+- Public marriage booking and parish appointment inquiries
+- Request tracking using a reference number
+- Staff dashboard for processing requests and managing records
+- Sacramental record management for Baptism, Confirmation, and Marriage
+- Certificate preparation and PDF generation
+- Payment verification when required
+- Email notifications and request status updates
+- Reports, analytics, and archived requests
 
-- **Parishioner portal:** submit certificate requests, inquire about services, and request appointments or bookings.
-- **Staff portal:** review and process submitted requests and manage assigned records.
-- **Priest portal:** access relevant parish schedules and records according to assigned permissions.
-- **Administrator portal:** manage users, services, requests, announcements, and system records.
-- **Shared services:** certificate request workflows, appointment booking, announcements, and reporting.
-
-The final scope and access rules will depend on parish requirements and approval.
+The system has one internal account type: **Parish Staff**. Priest approval, if required by parish policy, will be handled through the parish's approved process outside the system unless a future requirement adds a dedicated priest account.
 
 ## Tech Stack
 
@@ -41,16 +44,15 @@ The final scope and access rules will depend on parish requirements and approval
 
 ```text
 OLAP/
-├── public/                 # Public static assets (if present)
+├── public/
 ├── src/
-│   ├── main.jsx            # Frontend entry point
-│   ├── App.jsx             # Application shell
-│   ├── styles/             # Global styles and design tokens
-│   ├── data/               # Static frontend content
-│   ├── layouts/            # Shared page layouts
-│   ├── components/         # Reusable UI components
-│   ├── pages/              # Page-level components
-│   └── features/           # Feature-specific UI
+│   ├── main.jsx
+│   ├── App.jsx
+│   ├── styles/
+│   ├── data/
+│   ├── layouts/
+│   ├── components/
+│   └── features/
 ├── index.html
 ├── vite.config.js
 ├── package.json
@@ -94,21 +96,9 @@ Vite will display the local development URL in the terminal.
 | `npm run build` | Build the frontend for production |
 | `npm run preview` | Preview the production build |
 
-## Planned Architecture
+## Before Production Use
 
-As backend and portal development begins, the application may be expanded with:
-
-- Separate layouts and route groups for each user role
-- Protected routes and server-side authorization
-- API services for communicating with the backend
-- Database-backed request, booking, and parish records
-- Validation, audit logs, and role-specific permissions
-
-These are architectural plans, not claims about the current implementation.
-
-## Development Notes
-
-This project is being developed with the intention of supporting real parish workflows. Before production use, it will require requirements validation with parish representatives, secure authentication and authorization, database backups, privacy controls, testing, and a deployment and maintenance plan.
+The project will require parish requirements validation, secure staff authentication and authorization, database integration, backups, privacy controls, testing, and a deployment and maintenance plan.
 
 ## Author
 
