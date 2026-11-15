@@ -13,12 +13,12 @@ export default function Hero() {
             <span>Our Lady of the Airways Parish Community</span>
           </div>
           <h1 className={styles.title}>
-            <span className={styles.gold}>Sacramental Records,</span> Marriage Bookings &amp;{' '}
-            <span className={styles.gold}>Service Requests</span>
+            <span className={styles.gold}>Parish Records,</span> Marriage Bookings &amp;{' '}
+            <span className={styles.gold}>Certificate Requests</span>
           </h1>
           <p className={styles.desc}>
-            Welcome to the digital portal of Our Lady of the Airways Parish. Request certificates,
-            book marriages, and submit parish service requests anytime, anywhere.
+            Welcome to the digital portal of Our Lady of the Airways Parish. Explore parish services,
+            submit certificate requests, and inquire about marriage bookings and appointments.
           </p>
           <div className={styles.cta}>
             <a href="#services" className={styles.secondary}>
@@ -26,9 +26,9 @@ export default function Hero() {
             </a>
           </div>
           <div className={styles.stats}>
-            <div><b>100%</b><span>Digitized Records Capability</span></div>
-            <div><b>24 / 7</b><span>Online Requests Access</span></div>
-            <div><b>Real-Time</b><span>Parish Analytics</span></div>
+            <div><b>Online</b><span>Parish Service Requests</span></div>
+            <div><b>Staff</b><span>Managed Processing</span></div>
+            <div><b>Parish</b><span>Records and Appointments</span></div>
           </div>
         </div>
         <div className={styles.right}>
