@@ -15,6 +15,7 @@ import CertificatesPage from './features/staff/pages/CertificatesPage.jsx';
 import RecordsPage from './features/staff/pages/RecordsPage.jsx';
 import EmailsPage from './features/staff/pages/EmailsPage.jsx';
 import NoRecordRequestPage from './features/certificates/pages/NoRecordRequestPage.jsx';
+import BaptismRegistrationPage from './features/certificates/pages/BaptismRegistrationPage.jsx';
 
 function ScrollToHash() {
   const { pathname, hash } = useLocation();
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/request/baptismal" element={<BaptismalRequestPage />} />
           <Route path="/request/confirmation" element={<ConfirmationRequestPage />} />
           <Route path="/request/no-record/:kind" element={<NoRecordRequestPage />} /> 
+          <Route path="/register/baptism" element={<BaptismRegistrationPage />} />
         </Route>
 
         {/* Staff portal (sidebar layout). TODO: protect with login guard */}

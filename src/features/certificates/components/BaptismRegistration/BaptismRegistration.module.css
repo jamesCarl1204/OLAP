@@ -1,0 +1,105 @@
+.panel {
+  padding: 1rem 1.1rem;
+  background: var(--ivory-100);
+  border: 1px solid var(--ivory-300);
+  border-radius: 0.75rem;
+}
+
+.panel h3 {
+  font-size: 1.05rem;
+  color: var(--navy-900);
+  margin-bottom: 0.4rem;
+}
+
+.panel p,
+.panel li {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--navy-700);
+}
+
+.panel ol,
+.panel ul {
+  padding-left: 1.1rem;
+}
+
+.price {
+  font-weight: 700;
+  color: var(--gold-700);
+}
+
+.sponsor {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  background: var(--ivory-50);
+  border: 1px solid var(--ivory-300);
+  border-radius: 0.6rem;
+}
+
+@media (min-width: 640px) {
+  .sponsor {
+    grid-template-columns: 1fr 1fr auto;
+    align-items: end;
+  }
+}
+
+.addBtn {
+  align-self: flex-start;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--navy-800);
+  border: 1px dashed var(--gold-600);
+  border-radius: 0.5rem;
+}
+
+.addBtn:hover {
+  background: var(--ivory-100);
+}
+
+.rm {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  border-radius: 0.5rem;
+}
+
+.feeTable {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1rem;
+  background: var(--ivory-100);
+  border-radius: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--navy-800);
+}
+
+.feeRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.feeTotal {
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid var(--ivory-300);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--navy-900);
+}
+
+.remind {
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: #92400e;
+  background: #fef3c7;
+  border-radius: 0.6rem;
+  text-align: left;
+}

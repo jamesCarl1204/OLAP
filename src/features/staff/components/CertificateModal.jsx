@@ -9,7 +9,7 @@ import { PARISH_PRIEST } from '../data/mock.js';
 // One place for the whole certificate flow: generate -> print -> send by email / release.
 export default function CertificateModal({ id, onClose }) {
   const { requests, issued, records } = useStaff();
-  const [signedBy, setSignedBy] = useState('[ Parish Priest Name ]');
+ const [signedBy, setSignedBy] = useState(PARISH_PRIEST);
   const [mailKind, setMailKind] = useState(null);
   const certRef = useRef(null);
 
@@ -25,7 +25,7 @@ export default function CertificateModal({ id, onClose }) {
   const draft = iss || {
     certificate_no: digital ? 'OLAP-CERT-####' : null,
     verify_token: digital ? 'preview' : null,
-    signed_by: signedBy.trim() || '[ Parish Priest Name ]',
+    signed_by: signedBy.trim() || PARISH_PRIEST,
     issued_at: new Date().toISOString(),
   };
 

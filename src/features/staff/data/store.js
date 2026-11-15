@@ -82,6 +82,12 @@ export const actions = {
       return addEvent(n, id, 'email_sent', 'Email sent: payment rejected.');
     });
   },
+    confirmRecord(id, rec) {
+    update((s) => addEvent(
+      { ...patchReq(s, id, { status: 'ready' }), records: { ...s.records, [id]: rec } },
+      id, 'status_changed', `Record found: Book ${rec.book_no} / Page ${rec.page_no} / Line ${rec.line_no}.`
+    ));
+  },
   confirmNoRecord(id) {
   update((s) => addEvent(patchReq(s, id, { status: 'ready' }), id, 'status_changed', 'Registry searched: no record found. Ready to issue Certificate of No Record.'));
 },

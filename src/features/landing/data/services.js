@@ -33,4 +33,10 @@ export const SERVICES = [
     badge: 'Appointment', icon: 'fa-regular fa-calendar-check',
     img: 'https://images.unsplash.com/photo-1510936428612-4c6c4261a8bd?auto=format&fit=crop&w=800&q=80',
     cta: 'Schedule Appointment' },
+   { id: 'baptism-registration', title: 'Baptism Registration', navLabel: 'Baptism Registration',
+  desc: 'Register a child for baptism: choose a schedule, submit the form and requirements, and pay the baptism fee.',
+  badge: 'Parish Service', icon: 'fa-solid fa-water',
+  img: 'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=800&q=80',
+  cta: 'Register for Baptism',
+  to: '/register/baptism' },
 ];

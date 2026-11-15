@@ -42,3 +42,39 @@ export const NO_RECORD_FEE = 100;
 
 // TODO: replace with the parish's official GCash details (ideally from an API / config, not hardcoded)
 export const GCASH = { number: '[parish official GCash number]', name: '[parish official account name]' };
+
+// ---- Baptism Registration (per the draft process doc; confirm with the parish) ----
+export const EXTRA_SPONSOR_FEE = 100;
+// weekdays: 0 = Sunday ... 6 = Saturday. freeSponsors = number of sponsors included in the base fee.
+export const BAPTISM_TYPES = [
+  { id: 'special', title: 'Special Baptism', days: 'Tuesday to Saturday', weekdays: [2, 3, 4, 5, 6],
+    times: ['11:00 AM', '2:00 PM'], base: 3500, stipend: 0, freeSponsors: 4,
+    note: 'Includes the first two (2) pairs of sponsors (Ninong and Ninang).' },
+  { id: 'common-sat', title: 'Common Baptism – Saturday', days: 'Saturday', weekdays: [6],
+    times: ['10:00 AM'], base: 1200, stipend: 500, freeSponsors: 2,
+    note: "₱1,200 first pair of sponsors + ₱500 priest's stipend." },
+  { id: 'common-sun', title: 'Common Baptism – Sunday', days: 'Sunday', weekdays: [0],
+    times: ['11:00 AM'], base: 1200, stipend: 0, freeSponsors: 2, maxAge: 7,
+    note: 'First pair of sponsors included. Only children below seven (7) years old.' },
+];
+
+export function baptismFee(type, sponsorCount) {
+  const extra = Math.max(0, sponsorCount - type.freeSponsors);
+  const extraFee = extra * EXTRA_SPONSOR_FEE;
+  return { base: type.base, stipend: type.stipend, extra, extraFee, total: type.base + type.stipend + extraFee };
+}
+
+export const BAPTISM_REQUIREMENTS = [
+  'Baptismal Form – filled out by the parent/s.',
+  'Birth Certificate – one (1) photocopy.',
+  'Marriage Contract – one (1) photocopy (only if the parents are legally married).',
+  'Certificate of No Record – required in case of late registration of the Birth Certificate.',
+];
+export const BAPTISM_REMINDERS = [
+  'Parents are responsible for filling out the Baptismal Form.',
+  'All required documents must be submitted upon registration.',
+  'A Certificate of No Record is required in case of late registration of the Birth Certificate.',
+  'Only children below seven (7) years old are allowed to be baptized on Sundays.',
+  'NO REQUIREMENTS, NO BAPTISM.',
+  'Parents must arrive at least one (1) hour before the scheduled baptism.',
+];
