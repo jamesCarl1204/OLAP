@@ -4,6 +4,7 @@ export const CERT_TYPES = [
   { id: 'confirmation', title: 'Confirmation Certificate', desc: 'Request a copy of a confirmation certificate.', icon: 'fa-solid fa-dove' },
   { id: 'marriage', title: 'Marriage Contract Certificate', desc: 'Request a copy of a marriage certificate.', icon: 'fa-solid fa-ring' },
   { id: 'no-record', title: 'No Record of Baptism / Confirmation', desc: 'Request certification that no corresponding record was found.', icon: 'fa-solid fa-file-circle-xmark' },
+  { id: 'confirmation', title: 'Confirmation Certificate', desc: 'Request a copy of a confirmation certificate.', icon: 'fa-solid fa-dove', to: '/request/confirmation' },
 ];
 
 export const FORMATS = [
@@ -25,5 +26,9 @@ export const PURPOSES = [
   'Marriage', 'Travel / Visa', 'Late Registration of Birth Certificate',
 ];
 
-// TODO: replace with the parish's official GCash details (ideally from an API / config, not hardcoded)
 export const GCASH = { number: '[parish official GCash number]', name: '[parish official account name]' };
+
+export const CONFIRMATION_PURPOSES = [
+  { id: 'records', label: 'Records / Personal Copy', fee: 100 },
+  { id: 'marriage', label: 'Marriage', fee: 200 },
+];

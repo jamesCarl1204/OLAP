@@ -5,6 +5,7 @@ import LandingPage from './features/landing/pages/LandingPage.jsx';
 import AuthPage from './features/auth/pages/AuthPage.jsx';
 import RequestPage from './features/certificates/pages/RequestPage.jsx';
 import BaptismalRequestPage from './features/certificates/pages/BaptismalRequestPage.jsx';
+import ConfirmationRequestPage from './features/certificates/pages/ConfirmationRequestPage.jsx';
 
 function ScrollToHash() {
   const { pathname, hash } = useLocation();
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/login" element={<AuthPage />} />
         <Route path="/request" element={<RequestPage />} />
         <Route path="/request/baptismal" element={<BaptismalRequestPage />} />
+        <Route path="/request/confirmation" element={<ConfirmationRequestPage />} />
       </Routes>
     </PublicLayout>
   );
