@@ -73,9 +73,7 @@ export default function BaptismalRequest() {
     e.preventDefault();
     if (!pay.method) return setError('Select a payment method.');
     if (pay.method === 'gcash' && !pay.proof) return setError('Upload your proof of payment.');
-    // TODO: POST request + proof to API; set refNo from the response.
-    setRefNo('PENDING');
-    go(4);
+    setError('Request submission is unavailable until the parish backend is connected. Your information has not been submitted.');
   };
 
   return (
