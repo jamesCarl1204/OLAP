@@ -75,9 +75,8 @@ export default function NoRecordRequest({ kind }) {
     e.preventDefault();
     if (!pay.method) return setError('Select a payment method.');
     if (pay.method === 'gcash' && !pay.proof) return setError('Upload your proof of payment.');
-    // TODO: POST request + proof to API; use the reference number it returns.
-    const n = String(Math.floor(Math.random() * 99999) + 1).padStart(5, '0');
-    setRefNo(`OLAP-${new Date().getFullYear()}-${n}`);
+    // TODO: POST request + proof to API; set refNo from the response.
+    setRefNo('PENDING');
     go(4);
   };
 
