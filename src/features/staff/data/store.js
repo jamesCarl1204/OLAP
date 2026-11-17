@@ -30,7 +30,7 @@ export function buildEmail(req, issued, kind) {
       to: req.contact_email,
       subject: `Your ${label} E-Certificate (${req.reference_no})`,
       attachment: `${issued?.certificate_no || req.reference_no}.pdf`,
-      body: `Dear ${req.requester_name},\n\nThank you for your request. Attached is the e-certificate for ${req.subject_name}.\n\nCertificate no.: ${issued?.certificate_no}\nYou can verify it by scanning the QR code on the certificate or by visiting olap.example/verify/${issued?.verify_token}.${sign}`,
+      body: `Dear ${req.requester_name},\n\nThank you for your request. Attached is the e-certificate for ${req.subject_name}.\n\nCertificate no.: ${issued?.certificate_no}\nA verification link will be provided once the parish backend is connected.${sign}`,
     };
   }
   const due = req.payment.method === 'pickup' ? `Amount to pay upon pickup: ${peso(req.fee_amount)}.` : 'Your payment has been received.';
