@@ -1,39 +1,21 @@
-// Tiny in-memory store so every staff page sees the same data while we have no backend.
-// TODO: replace each action with an API call (PATCH /requests/:id/..., POST /certificates, POST /emails/send).
-import { useSyncExternalStore } from 'react';
-import { REQUESTS, EVENTS, ISSUED, REGISTRY, EMAILS, STATUS, CERT_LABELS, peso, PARISH_PRIEST, BAPTISMS, MASSES } from './mock.js';
+// Backend-ready staff data access placeholder.
+// No sample records or in-memory mutations are used before the API is connected.
+import { CERT_LABELS, peso } from './mock.js';
 import { BAPTISM_TYPES, MASS_TYPES } from '../../../data/certificates.js';
 
 export const TYPE_KEY = { baptismal: 'baptism', confirmation: 'confirmation', marriage: 'marriage', no_record_baptism: 'baptism', no_record_confirmation: 'confirmation' };
 
-const autoRecord = (r) =>
-  REGISTRY.find((x) => x.record_type === TYPE_KEY[r.certificate_type] && x.full_name === r.subject_name) || null;
+const EMPTY_STATE = {
+  requests: [],
+  baptisms: [],
+  masses: [],
+  events: {},
+  records: {},
+  issued: {},
+  emails: [],
+};
 
-function initial() {
-  const requests = REQUESTS.map((r) => ({ ...r, payment: { ...r.payment } }));
-  const baptisms = BAPTISMS.map((b) => ({ ...b, payment: { ...b.payment }, staff: { ...b.staff } }));
-  const masses = MASSES.map((m) => ({ ...m, payment: { ...m.payment } }));
-  const events = {};
-  const records = {};
-  requests.forEach((r) => {
-    events[r.id] = EVENTS[r.id]
-      ? [...EVENTS[r.id]]
-      : [{ type: 'submitted', note: 'Request submitted by requester.', actor: 'Requester', at: r.submitted_at }];
-    if (['ready', 'released', 'sent'].includes(r.status)) {
-      const rec = autoRecord(r);
-      if (rec) records[r.id] = rec;
-    }
-  });
-  baptisms.forEach((b) => { events[`b${b.id}`] = [{ type: 'submitted', note: 'Registration submitted by parent.', actor: 'Requester', at: b.submitted_at }]; });
-  masses.forEach((m) => { events[`m${m.id}`] = [{ type: 'submitted', note: 'Request submitted by requester.', actor: 'Requester', at: m.submitted_at }]; });
-  return { requests, baptisms, masses, events, records, issued: { ...ISSUED }, emails: EMAILS.map((e) => ({ ...e })) };
-}
-
-let state = initial();
-const listeners = new Set();
-const subscribe = (l) => { listeners.add(l); return () => listeners.delete(l); };
-const update = (fn) => { state = fn(state); listeners.forEach((l) => l()); };
-export const useStaff = () => useSyncExternalStore(subscribe, () => state);
+export const useStaff = () => EMPTY_STATE;
 
 // ---- helpers ----
 const longDay = (d) => (d ? new Date(`${d}T00:00:00`).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : '—');
