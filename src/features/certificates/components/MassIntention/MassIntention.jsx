@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { MASS_TYPES, MASS_TIMES, MASS_OFFERING_NOTE, GCASH } from '../../../../data/certificates.js';
 import base from '../BaptismalRequest/BaptismalRequest.module.css';
 import own from './MassIntention.module.css';
- import { actions } from '../../../staff/data/store.js';
 const STEPS = ['Details', 'Type', 'Schedule', 'Payment', 'Done'];
 const TODAY = new Date().toISOString().slice(0, 10);
 const EMPTY = { requestor: '', phone: '', email: '', prayedFor: '', special: '' };
@@ -77,10 +76,7 @@ export default function MassIntention() {
     if (!pay.gcashRef.trim()) return setError('Enter your GCash reference number.');
     if (!pay.proof) return setError('Upload your GCash payment receipt (screenshot).');
   }
-  // TODO: replace actions.createMass with a POST to the API.
-  const ref = actions.createMass({ typeId, date: sched.date, time: sched.time, form, pay });
-  setRefNo(ref);
-  go(5);
+  setError('Request submission is unavailable until the parish backend is connected. Your information has not been submitted.');
 };
 
   return (
