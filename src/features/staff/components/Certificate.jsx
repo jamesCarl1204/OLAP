@@ -191,7 +191,7 @@ function NoRecordCertificate({ req, issued, innerRef }) {
           {digital ? <QrMock seed={issued.verify_token || issued.certificate_no || 'x'} /> : <div style={S.seal}>Parish dry seal</div>}
           {digital && (
             <div style={{ ...S.meta, marginTop: '6px' }}>
-              No. {issued.certificate_no}<br />Verify: olap.example/verify/{issued.verify_token}
+              No. {issued.certificate_no}<br />Verification link will be available once the backend is connected.
             </div>
           )}
         </div>
@@ -239,7 +239,7 @@ export default function Certificate({ req, record, issued, innerRef }) {
           {digital ? <QrMock seed={issued.verify_token || issued.certificate_no || 'x'} /> : <div style={S.seal}>Parish dry seal</div>}
           {digital && (
             <div style={{ ...S.meta, marginTop: '6px' }}>
-              No. {issued.certificate_no}<br />Verify: olap.example/verify/{issued.verify_token}
+              No. {issued.certificate_no}<br />Verification link will be available once the backend is connected.
             </div>
           )}
         </div>
