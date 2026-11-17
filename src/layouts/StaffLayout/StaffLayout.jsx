@@ -8,6 +8,8 @@ const NAV = [
   { to: '/staff/requests', label: 'Requests', icon: 'fa-solid fa-inbox' },
   { to: '/staff/payments', label: 'Payments', icon: 'fa-solid fa-money-check-dollar' },
   { to: '/staff/certificates', label: 'Certificates', icon: 'fa-solid fa-stamp' },
+  { to: '/staff/baptisms', label: 'Baptisms', icon: 'fa-solid fa-water' },
+  { to: '/staff/masses', label: 'Mass Intentions', icon: 'fa-solid fa-hands-praying' },
   { to: '/staff/records', label: 'Records', icon: 'fa-solid fa-book-bible' },
   { to: '/staff/emails', label: 'Email Outbox', icon: 'fa-solid fa-envelope' },
 ];
@@ -15,11 +17,13 @@ const NAV = [
 // TODO: replace the hard-coded name with the logged-in user.
 export default function StaffLayout() {
   const [open, setOpen] = useState(false);
-  const { requests, issued } = useStaff();
-  const counts = {
-    '/staff/payments': requests.filter((r) => r.status === 'payment_check').length,
-    '/staff/certificates': requests.filter((r) => r.status === 'ready' && !issued[r.id]).length,
-  };
+const { requests, issued, baptisms, masses } = useStaff();
+const counts = {
+  '/staff/payments': requests.filter((r) => r.status === 'payment_check').length,
+  '/staff/certificates': requests.filter((r) => r.status === 'ready' && !issued[r.id]).length,
+  '/staff/baptisms': baptisms.filter((b) => b.status === 'pending').length,
+  '/staff/masses': masses.filter((m) => m.status === 'pending').length,
+};
   const close = () => setOpen(false);
 
   return (

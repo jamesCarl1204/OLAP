@@ -5,7 +5,7 @@ import { STATUS, CERT_LABELS, peso, fmtDate } from '../data/mock.js';
 import styles from '../styles/Staff.module.css';
 
 export default function DashboardPage() {
-  const { requests, emails, issued } = useStaff();
+  const { requests, emails, issued, baptisms, masses } = useStaff();
   const count = (s) => requests.filter((r) => r.status === s).length;
   const toIssue = requests.filter((r) => r.status === 'ready' && !issued[r.id]).length;
   const failed = emails.filter((e) => e.status === 'failed').length;
@@ -17,6 +17,8 @@ export default function DashboardPage() {
     { icon: 'fa-solid fa-money-check-dollar', value: count('payment_check'), label: 'Proofs to verify', to: '/staff/payments' },
     { icon: 'fa-solid fa-magnifying-glass', value: count('record_check'), label: 'Records to check', to: '/staff/requests' },
     { icon: 'fa-solid fa-stamp', value: toIssue, label: 'Certificates to issue', to: '/staff/certificates' },
+  { icon: 'fa-solid fa-water', value: baptisms.filter((b) => b.status === 'pending').length, label: 'Baptisms to review', to: '/staff/baptisms' },
+{ icon: 'fa-solid fa-hands-praying', value: masses.filter((m) => m.status === 'pending').length, label: 'Mass Intentions to verify', to: '/staff/masses' },
   ];
   const recent = [...requests].sort((a, b) => b.submitted_at.localeCompare(a.submitted_at)).slice(0, 5);
   const byStatus = Object.keys(STATUS).map((k) => ({ key: k, n: count(k) }));

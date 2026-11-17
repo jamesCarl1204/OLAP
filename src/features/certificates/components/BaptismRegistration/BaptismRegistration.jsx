@@ -5,6 +5,7 @@ import {
 } from '../../../../data/certificates.js';
 import base from '../BaptismalRequest/BaptismalRequest.module.css';
 import own from './BaptismRegistration.module.css';
+import { actions } from '../../../staff/data/store.js';
 
 const STEPS = ['Info', 'Schedule', 'Form', 'Files', 'Pay', 'Done'];
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -123,14 +124,14 @@ export default function BaptismRegistration() {
   };
 
   const submitRequest = (e) => {
-    e.preventDefault();
-    if (!pay.method) return setError('Select a payment method.');
-    if (pay.method === 'gcash' && !pay.proof) return setError('Upload your proof of payment.');
-    // TODO: POST form + files + proof to API; use the reference number it returns.
-    const n = String(Math.floor(Math.random() * 99999) + 1).padStart(5, '0');
-    setRefNo(`OLAP-${new Date().getFullYear()}-${n}`);
-    go(6);
-  };
+  e.preventDefault();
+  if (!pay.method) return setError('Select a payment method.');
+  if (pay.method === 'gcash' && !pay.proof) return setError('Upload your proof of payment.');
+  // TODO: replace actions.createBaptism with a POST to the API.
+  const ref = actions.createBaptism({ typeId: sched.typeId, date: sched.date, time: sched.time, form, files, pay, total: fee.total });
+  setRefNo(ref);
+  go(6);
+};
 
   return (
     <div className={base.card}>

@@ -78,3 +78,18 @@ export const BAPTISM_REMINDERS = [
   'NO REQUIREMENTS, NO BAPTISM.',
   'Parents must arrive at least one (1) hour before the scheduled baptism.',
 ];
+
+// ---- Mass Intention (Pamisa), per the draft process doc ----
+export const MASS_TYPES = [
+  { id: 'thanksgiving', title: 'Thanksgiving', desc: 'For blessings, achievements, and answered prayers.' },
+  { id: 'dead', title: 'For the Dead / Eternal Repose', desc: 'Prayer for deceased loved ones.' },
+  { id: 'good-health', title: 'Good Health', desc: 'Prayer for good health and protection.' },
+  { id: 'healing', title: 'Healing', desc: 'Prayer for physical, emotional, and spiritual healing.' },
+  { id: 'birthday', title: 'Birthday', desc: 'Thanksgiving and prayers for someone celebrating a birthday.' },
+  { id: 'anniversary', title: 'Wedding Anniversary', desc: 'Thanksgiving and prayers for married couples.' },
+  { id: 'special', title: 'Special Intentions', desc: 'For personal prayers and other special requests.' },
+];
+
+// TODO: Mass times and the offering amount must come from the parish. Placeholders only.
+export const MASS_TIMES = ['[Mass time 1]', '[Mass time 2]', '[Mass time 3]'];
+export const MASS_OFFERING_NOTE = 'The offering amount is set by the parish.';

@@ -24,7 +24,7 @@ export default function EmailsPage() {
           <tbody>
             {emails.map((e) => (
               <tr key={e.id}>
-                <td><Link className={styles.ref} to={`/staff/requests/${e.request_id}`}>{e.reference_no}</Link></td>
+                <td><Link className={styles.ref} to={e.kind === 'baptism' ? '/staff/baptisms' : e.kind === 'mass' ? '/staff/masses' : `/staff/requests/${e.request_id}`}>{e.reference_no}</Link></td>
                 <td>{e.to_email}</td>
                 <td>{e.template_key.replace(/_/g, ' ')}</td>
                 <td>{e.subject}</td>

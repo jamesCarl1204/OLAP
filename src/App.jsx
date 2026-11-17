@@ -16,6 +16,9 @@ import RecordsPage from './features/staff/pages/RecordsPage.jsx';
 import EmailsPage from './features/staff/pages/EmailsPage.jsx';
 import NoRecordRequestPage from './features/certificates/pages/NoRecordRequestPage.jsx';
 import BaptismRegistrationPage from './features/certificates/pages/BaptismRegistrationPage.jsx';
+import MassIntentionPage from './features/certificates/pages/MassIntentionPage.jsx';
+import BaptismsPage from './features/staff/pages/BaptismPage.jsx';
+import MassIntentionsPage from './features/staff/pages/MassIntentionsPage.jsx';
 
 function ScrollToHash() {
   const { pathname, hash } = useLocation();
@@ -40,6 +43,9 @@ export default function App() {
           <Route path="/request/confirmation" element={<ConfirmationRequestPage />} />
           <Route path="/request/no-record/:kind" element={<NoRecordRequestPage />} /> 
           <Route path="/register/baptism" element={<BaptismRegistrationPage />} />
+          <Route path="/register/mass-intention" element={<MassIntentionPage />} />
+          <Route path="baptisms" element={<BaptismsPage />} />
+          <Route path="masses" element={<MassIntentionsPage />} />
         </Route>
 
         {/* Staff portal (sidebar layout). TODO: protect with login guard */}

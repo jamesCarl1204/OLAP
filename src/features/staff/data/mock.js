@@ -76,15 +76,13 @@ export const REQUESTS = [
     requester_name: 'Ramon Peña', contact_email: 'ramonp@email.com', contact_phone: '0933 444 1212',
     fee_amount: 200, submitted_at: '2026-10-28T13:15:00',
     payment: { method: 'pickup', status: 'pending' } },
-{ id: 9, reference_no: 'OLAP-2026-00009', certificate_type: 'no_record_baptism', format: 'hardcopy', status: 'record_check',
-  subject_name: 'JUAN TOLONGES DELA CRUZ', father_name: 'POPOY DELA CRUZ', mother_name: 'MARITES TOLONGES',
-  birth_date: '2025-12-26', birth_place: 'MANILA', event_date: null, purpose: null,
-  destination_church: 'ST. ANDREW CATHEDRAL', destination_city: 'PARAÑAQUE CITY',
-  requester_name: 'Marites Tolonges', contact_email: 'marites@email.com', contact_phone: '0917 000 9999',
-  fee_amount: 100, submitted_at: '2026-11-13T10:00:00',
-  payment: { method: 'pickup', status: 'paid_on_pickup' } },
-
-
+  { id: 9, reference_no: 'OLAP-2026-00009', certificate_type: 'no_record_baptism', format: 'hardcopy', status: 'record_check',
+    subject_name: 'JUAN TOLONGES DELA CRUZ', father_name: 'POPOY DELA CRUZ', mother_name: 'MARITES TOLONGES',
+    birth_date: '2025-12-26', birth_place: 'MANILA', event_date: null, purpose: null,
+    destination_church: 'ST. ANDREW CATHEDRAL', destination_city: 'PARAÑAQUE CITY',
+    requester_name: 'Marites Tolonges', contact_email: 'marites@email.com', contact_phone: '0917 000 9999',
+    fee_amount: 100, submitted_at: '2026-11-13T10:00:00',
+    payment: { method: 'pickup', status: 'paid_on_pickup' } },
 ];
 
 export const EVENTS = {
@@ -164,3 +162,83 @@ REQUESTS.forEach((r) => {
     p.proof = { name: p.proof_name, type: isPdf ? 'pdf' : 'image', size_kb: 240, uploaded_at: r.submitted_at, url: isPdf ? null : receiptSvg(r) };
   }
 });
+
+// =====================================================================
+// Baptism Registration + Mass Intention (staff side mock data)
+// =====================================================================
+export const BAPTISM_STATUS = {
+  pending:   { label: 'Pending',   tone: 'warn' },
+  approved:  { label: 'Approved',  tone: 'ok' },
+  completed: { label: 'Completed', tone: 'done' },
+  on_hold:   { label: 'On Hold',   tone: 'muted' },
+  rejected:  { label: 'Rejected',  tone: 'bad' },
+};
+export const MASS_STATUS = {
+  pending:   { label: 'Pending',   tone: 'warn' },
+  approved:  { label: 'Approved',  tone: 'ok' },
+  completed: { label: 'Completed', tone: 'done' },
+  rejected:  { label: 'Rejected',  tone: 'bad' },
+};
+export const MASS_PAYMENT = {
+  pending_payment:  { label: 'Pending Payment',  tone: 'warn' },
+  for_verification: { label: 'For Verification', tone: 'info' },
+  paid:             { label: 'Paid',             tone: 'ok' },
+  rejected:         { label: 'Rejected',         tone: 'bad' },
+};
+
+const docSvg = (label) => `data:image/svg+xml;utf8,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="640"><rect width="480" height="640" fill="#fff" stroke="#cbd5e1"/><text x="240" y="300" text-anchor="middle" font-family="Arial" font-size="22" fill="#334155">${label}</text><text x="240" y="340" text-anchor="middle" font-family="Arial" font-size="13" fill="#94a3b8">Sample upload (mock data)</text></svg>`)}`;
+const mockFile = (key, label, name, at) => ({ key, label, name, type: 'image', size_kb: 180, uploaded_at: at, url: docSvg(label) });
+const mockProof = (fee, payment, id, at) => ({ name: 'gcash-proof.jpg', type: 'image', size_kb: 240, uploaded_at: at, url: receiptSvg({ fee_amount: fee, payment, id }) });
+
+const bPay1 = { method: 'gcash', status: 'pending', sender_gcash_number: '0917 000 9999', sender_account_name: 'MARITES TOLONGES' };
+export const BAPTISMS = [
+  { id: 1, reference_no: 'OLAP-2026-00010', type_id: 'common-sat', date: '2027-01-09', time: '10:00 AM', confirmed_date: '2027-01-09', confirmed_time: '10:00 AM',
+    status: 'pending', submitted_at: '2026-11-15T09:00:00', fee_total: 1900,
+    child: { surname: 'DELA CRUZ', given: 'JUAN', middle: 'TOLONGES', dob: '2025-12-26', pob: 'MANILA' },
+    father: { name: 'POPOY DELA CRUZ', pob: 'MANILA' }, mother: { name: 'MARITES TOLONGES', pob: 'QUEZON CITY' },
+    marriage_kind: 'Catholic', venue: 'SAMPLE PARISH, PASAY CITY', address: '123 SAMPLE STREET, PASAY CITY',
+    sponsors: [
+      { name: 'MARIA SANTOS', address: 'PASAY CITY' }, { name: 'JOSE MARI CHAN', address: 'PASAY CITY' },
+      { name: 'ANA REYES', address: 'PARAÑAQUE CITY' }, { name: 'PEDRO REYES', address: 'PARAÑAQUE CITY' },
+    ],
+    email: 'marites@email.com', phone: '0917 000 9999', parent_name: 'MARITES TOLONGES',
+    married_legally: true, late_birth_reg: false,
+    files: [mockFile('birth', 'Birth Certificate', 'birth-cert.jpg', '2026-11-15T09:00:00'), mockFile('marriage', 'Marriage Contract', 'marriage.jpg', '2026-11-15T09:00:00')],
+    payment: { ...bPay1, proof: mockProof(1900, bPay1, 101, '2026-11-15T09:00:00') },
+    staff: { priest: '', book: '', page: '', line: '', stipend: '', received_by: '' } },
+  { id: 2, reference_no: 'OLAP-2026-00011', type_id: 'special', date: '2027-01-12', time: '2:00 PM', confirmed_date: '2027-01-12', confirmed_time: '2:00 PM',
+    status: 'pending', submitted_at: '2026-11-14T15:30:00', fee_total: 3500,
+    child: { surname: 'GARCIA', given: 'SOFIA', middle: 'BAUTISTA', dob: '2026-03-02', pob: 'PASAY CITY' },
+    father: { name: 'ANTONIO GARCIA', pob: 'MANILA' }, mother: { name: 'LUZ BAUTISTA', pob: 'PASAY CITY' },
+    marriage_kind: 'Civil', venue: 'PASAY CITY HALL', address: '45 SAMPLE AVE., PASAY CITY',
+    sponsors: [
+      { name: 'LUIS GOMEZ', address: 'PASAY CITY' }, { name: 'ROSA LIM', address: 'PASAY CITY' },
+      { name: 'DANIEL BAUTISTA', address: 'MANILA' }, { name: 'CHERRY ONG', address: 'MANILA' },
+    ],
+    email: 'luzgarcia@email.com', phone: '0915 222 3344', parent_name: 'LUZ BAUTISTA',
+    married_legally: true, late_birth_reg: true,
+    files: [mockFile('birth', 'Birth Certificate', 'birth.jpg', '2026-11-14T15:30:00'), mockFile('marriage', 'Marriage Contract', 'marriage.jpg', '2026-11-14T15:30:00')],
+    payment: { method: 'pickup', status: 'paid_on_pickup', proof: null },
+    staff: { priest: '', book: '', page: '', line: '', stipend: '', received_by: '' } },
+];
+
+const mPay1 = { method: 'gcash', status: 'for_verification', gcash_ref: '1234 567 890123' };
+const mPay3 = { method: 'gcash', status: 'paid', gcash_ref: '9876 543 210987' };
+export const MASSES = [
+  { id: 1, reference_no: 'OLAP-2026-00012', requestor: 'MARITES TOLONGES', phone: '0917 000 9999', email: 'marites@email.com',
+    prayed_for: 'JUAN TOLONGES DELA CRUZ', special: 'PLEASE INCLUDE THE FAMILY IN THE PRAYER.', type_id: 'birthday',
+    date: '2027-01-16', time: '[Mass time 1]', confirmed_date: '2027-01-16', confirmed_time: '[Mass time 1]',
+    status: 'pending', submitted_at: '2026-11-15T10:00:00',
+    payment: { ...mPay1, proof: mockProof(0, { sender_account_name: 'MARITES TOLONGES', sender_gcash_number: '0917 000 9999' }, 201, '2026-11-15T10:00:00') } },
+  { id: 2, reference_no: 'OLAP-2026-00013', requestor: 'SAMPLE NAME', phone: '0928 555 0101', email: '',
+    prayed_for: 'SAMPLE NAME', special: '', type_id: 'dead',
+    date: '2027-01-17', time: '[Mass time 2]', confirmed_date: '2027-01-17', confirmed_time: '[Mass time 2]',
+    status: 'pending', submitted_at: '2026-11-15T11:20:00',
+    payment: { method: 'cash', status: 'pending_payment', gcash_ref: '', proof: null } },
+  { id: 3, reference_no: 'OLAP-2026-00014', requestor: 'ROSA DIAZ', phone: '0917 000 1122', email: 'rosa.d@email.com',
+    prayed_for: 'MIGUEL SANTOS', special: '', type_id: 'anniversary',
+    date: '2027-01-20', time: '[Mass time 3]', confirmed_date: '2027-01-20', confirmed_time: '[Mass time 3]',
+    status: 'approved', submitted_at: '2026-11-12T08:40:00',
+    payment: { ...mPay3, proof: mockProof(0, { sender_account_name: 'ROSA DIAZ', sender_gcash_number: '0917 000 1122' }, 203, '2026-11-12T08:40:00') } },
+];

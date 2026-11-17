@@ -39,4 +39,10 @@ export const SERVICES = [
   img: 'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=800&q=80',
   cta: 'Register for Baptism',
   to: '/register/baptism' },
+  { id: 'mass-intention', title: 'Pamisa / Mass Intention', navLabel: 'Mass Intention',
+  desc: 'Request a Mass Intention for thanksgiving, the dead, healing, birthdays, anniversaries, and more. Choose a date and give your offering online or at the office.',
+  badge: 'Parish Service', icon: 'fa-solid fa-hands-praying',
+  img: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=800&q=80',
+  cta: 'Request Mass Intention',
+  to: '/register/mass-intention' },
 ];
