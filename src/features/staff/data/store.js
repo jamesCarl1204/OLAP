@@ -84,6 +84,7 @@ export const actions = {
   verifyPayment: unavailable,
   rejectPayment: unavailable,
   confirmNoRecord: unavailable,
+  confirmRecord: unavailable,
   noRecord: unavailable,
   generate: unavailable,
   sendEmail: unavailable,
