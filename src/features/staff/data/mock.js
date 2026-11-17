@@ -1,4 +1,4 @@
-// MOCK DATA for the staff portal UI. Shapes follow the OLAP database tables.
+// Staff portal labels and empty data placeholders.
 // TODO: replace with API calls once the backend is ready.
 export const PARISH_PRIEST = 'REV. FR. RICARDO F. VALENCIA, JR.';
 export const STATUS = {
@@ -50,10 +50,6 @@ export const fmtLong = (d) => d ? new Date(d).toLocaleDateString('en-PH', { year
 
 // TODO: seed from API
 export const ISSUED = {};
-
-// Fake GCash receipt image so the proof viewer has something to show.
-// In the real system this is the uploaded file (files table, storage_key).
-
 
 // =====================================================================
 // Baptism Registration + Mass Intention (staff side)
