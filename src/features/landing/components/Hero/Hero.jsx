@@ -1,5 +1,5 @@
 import styles from './Hero.module.css';
-
+import pimg from './image.png'
 const parishImage = 'https://images.unsplash.com/photo-1548625149-fc4a29cf7092?auto=format&fit=crop&w=1200&q=85';
 
 export default function Hero() {
@@ -32,7 +32,7 @@ export default function Hero() {
           </div>
         </div>
         <div className={styles.right}>
-          <img src={parishImage} alt="Church interior" />
+          <img src={pimg} alt="Church interior" />
         </div>
       </div>
     </section>

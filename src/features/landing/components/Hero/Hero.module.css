@@ -1,7 +1,10 @@
 .hero {
   position: relative;
   overflow: hidden;
-  padding: 5rem 0 6rem;
+  min-height: calc(100vh - var(--header-h));
+  display: flex;
+  align-items: center;
+  padding: 3rem 0;
   border-bottom: 1px solid rgba(232,226,217,0.7);
   background: linear-gradient(125deg, rgba(243,239,234,0.96) 0%, rgba(232,226,217,0.91) 52%, rgba(216,207,194,0.86) 100%);
 }
@@ -29,6 +32,7 @@
 .grid {
   position: relative;
   z-index: 1;
+  width: 100%;
   display: grid;
   grid-template-columns: 1fr;
   align-items: center;
@@ -160,7 +164,7 @@
 }
 @media (min-width: 1024px) {
   .hero {
-    padding: 8rem 0 9rem;
+    padding: 3.5rem 0;
   }
   .grid {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);

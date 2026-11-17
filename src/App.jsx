@@ -44,9 +44,7 @@ export default function App() {
           <Route path="/request/no-record/:kind" element={<NoRecordRequestPage />} /> 
           <Route path="/register/baptism" element={<BaptismRegistrationPage />} />
           <Route path="/register/mass-intention" element={<MassIntentionPage />} />
-          <Route path="baptisms" element={<BaptismsPage />} />
-          <Route path="masses" element={<MassIntentionsPage />} />
-        </Route>
+         </Route>
 
         {/* Staff portal (sidebar layout). TODO: protect with login guard */}
         <Route path="/staff" element={<StaffLayout />}>
@@ -57,6 +55,9 @@ export default function App() {
           <Route path="certificates" element={<CertificatesPage />} />
           <Route path="records" element={<RecordsPage />} />
           <Route path="emails" element={<EmailsPage />} />
+          <Route path="baptisms" element={<BaptismsPage />} />
+          <Route path="masses" element={<MassIntentionsPage />} />
+       
         </Route>
       </Routes>
     </>
