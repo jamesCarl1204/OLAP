@@ -37,9 +37,14 @@ export default function Header() {
           <Link to="/#contact">Contact</Link>
         </nav>
 
-        <Link to="/request" className={styles.portalBtn}>
-          <i className="fa-solid fa-calendar-check" /> Book Now
-        </Link>
+        <div className={styles.actions}>
+          <Link to="/login" className={styles.staffLoginBtn}>
+            <i className="fa-solid fa-user-lock" /> Staff Login
+          </Link>
+          <Link to="/request" className={styles.portalBtn}>
+            <i className="fa-solid fa-calendar-check" /> Book Now
+          </Link>
+        </div>
 
         <button className={styles.burger} onClick={() => setOpen(!open)} aria-label="Menu">
           <i className={`fa-solid ${open ? 'fa-xmark' : 'fa-bars'}`} />
@@ -52,6 +57,9 @@ export default function Header() {
           <Link to="/#about" onClick={close}>About</Link>
           <Link to="/#services" onClick={close}>Services</Link>
           <Link to="/#contact" onClick={close}>Contact</Link>
+          <Link to="/login" onClick={close} className={styles.mobileStaffLogin}>
+            <i className="fa-solid fa-user-lock" /> Staff Login
+          </Link>
           <Link to="/request" onClick={close} className={styles.mobilePortal}>
             <i className="fa-solid fa-calendar-check" /> Book Now
           </Link>
