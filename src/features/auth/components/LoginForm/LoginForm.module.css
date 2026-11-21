@@ -180,3 +180,9 @@
   font-size: 0.75rem;
   color: #f87171;
 }
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
