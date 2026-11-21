@@ -1,0 +1,1 @@
+// Staff authentication middleware placeholder.
