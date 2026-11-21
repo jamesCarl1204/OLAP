@@ -151,8 +151,33 @@
   background: var(--ivory-50);
   color: var(--gold-700);
 }
-.portalBtn {
+.actions {
   display: none;
+  align-items: center;
+  gap: 0.65rem;
+}
+.staffLoginBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--navy-800);
+  border: 1px solid rgba(20, 42, 65, 0.2);
+  border-radius: 0.75rem;
+  transition: var(--ease);
+}
+.staffLoginBtn i {
+  color: var(--gold-600);
+}
+.staffLoginBtn:hover {
+  color: var(--gold-700);
+  background: var(--ivory-100);
+}
+.portalBtn {
+  display: flex;
   align-items: center;
   gap: 0.6rem;
   padding: 0.65rem 1.5rem;
@@ -198,6 +223,22 @@
 .mobile > a:not(.mobilePortal):hover {
   background: var(--ivory-100);
 }
+.mobileStaffLogin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.8rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--navy-800);
+  border: 1px solid rgba(20, 42, 65, 0.2);
+  border-radius: 0.75rem;
+}
+.mobileStaffLogin i {
+  color: var(--gold-600);
+}
 .mobilePortal {
   display: flex;
   align-items: center;
@@ -220,7 +261,7 @@
   }
 }
 @media (min-width: 768px) {
-  .nav, .portalBtn {
+  .nav, .actions {
     display: flex;
   }
   .burger, .mobile {
