@@ -1,0 +1,1 @@
+// Staff authentication service placeholder.
