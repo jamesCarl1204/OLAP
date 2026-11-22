@@ -28,6 +28,7 @@ export default function RequestDetailPage() {
   const [rq, setRq] = useState(req ? req.subject_name : '');
   const [proofOpen, setProofOpen] = useState(false);
   const [certOpen, setCertOpen] = useState(false);
+  const [done, setDone] = useState({});
 
   const matches = useRegistrySearch(req ? TYPE_KEY[req.certificate_type] : '', rq, req?.status === 'record_check');
 
@@ -49,6 +50,9 @@ export default function RequestDetailPage() {
   const idx = stepIndex(req);
   const STEPS = ['Submitted', 'Payment', 'Record', 'Certificate', digital ? 'Sent' : 'Released'];
   const isDone = (i) => i < idx || (idx === 4 && i === 4);
+
+  const checklist = checklistFor(req.certificate_type);
+  const reviewed = !checklist || checklist.every((i) => done[i.key]);
 
   return (
     <>
@@ -103,6 +107,9 @@ export default function RequestDetailPage() {
               <KV label="Phone" value={req.contact_phone} />
             </div>
           </div>
+
+          {/* REVIEW SUBMISSION (baptismal only for now) */}
+          <SubmissionReview req={req} done={done} setDone={setDone} locked={req.status !== 'submitted'} />
 
           {/* PAYMENT */}
           <div className={styles.card}>
@@ -215,8 +222,8 @@ export default function RequestDetailPage() {
             <h2><i className="fa-solid fa-bolt" /> Actions</h2>
             <div className={styles.actions}>
               {req.status === 'submitted' && (
-                <button type="button" className={styles.btn} onClick={() => actions.start(rid)}>
-                  <i className="fa-solid fa-play" /> {gcash ? 'Start payment check' : 'Start record check'}
+                <button type="button" className={styles.btn} disabled={!reviewed} onClick={() => actions.start(rid)}>
+                  <i className="fa-solid fa-play" /> Approve &amp; {gcash ? 'check payment' : 'check record'}
                 </button>
               )}
               {req.status === 'payment_check' && <p className={styles.note}>Open the proof of payment, then verify or reject it.</p>}

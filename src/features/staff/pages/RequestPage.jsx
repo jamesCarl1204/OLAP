@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Badge from '../components/Badge.jsx';
+import RequestFormModal from '../components/RequestFormModal.jsx';
 import { useStaff } from '../data/store.js';
 import { STATUS, PAYMENT_STATUS, CERT_LABELS, peso, fmtDate } from '../data/mock.js';
 import styles from '../styles/Staff.module.css';
@@ -10,6 +11,7 @@ export default function RequestsPage() {
   const [q, setQ] = useState('');
   const [status, setStatus] = useState('');
   const [type, setType] = useState('');
+  const [openId, setOpenId] = useState(null);
 
   const term = q.trim().toLowerCase();
   const rows = requests
@@ -47,7 +49,7 @@ export default function RequestsPage() {
         {rows.length === 0 ? <p className={styles.empty}>No requests match your filters.</p> : (
           <table className={styles.table}>
             <thead>
-              <tr><th>Reference</th><th>Name on certificate</th><th>Type</th><th>Format</th><th>Fee</th><th>Payment</th><th>Status</th><th>Submitted</th></tr>
+              <tr><th>Reference</th><th>Name on certificate</th><th>Type</th><th>Format</th><th>Fee</th><th>Payment</th><th>Status</th><th>Submitted</th><th /></tr>
             </thead>
             <tbody>
               {rows.map((r) => (
@@ -63,12 +65,21 @@ export default function RequestsPage() {
                   </td>
                   <td><Badge tone={STATUS[r.status].tone}>{STATUS[r.status].label}</Badge></td>
                   <td className={styles.muted}>{fmtDate(r.submitted_at)}</td>
+                  <td>
+                    <button type="button"
+                      className={`${r.status === 'submitted' ? styles.btn : styles.btnGhost} ${styles.btnSm}`}
+                      onClick={() => setOpenId(r.id)}>
+                      <i className="fa-solid fa-eye" /> {r.status === 'submitted' ? 'Review form' : 'View form'}
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
       </div>
+
+      {openId && <RequestFormModal key={openId} id={openId} onClose={() => setOpenId(null)} />}
     </>
   );
 }

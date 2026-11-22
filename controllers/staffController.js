@@ -37,6 +37,7 @@ const toRequest = (r) => ({
   contact_phone: r.contact_phone,
   fee_amount: Number(r.fee_amount),
   submitted_at: r.submitted_at,
+  consent_at: r.consent_at,
   duplicates: Number(r.dupes),
   payment: {
     method: r.pay_method,
