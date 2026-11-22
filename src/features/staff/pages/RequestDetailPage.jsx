@@ -3,8 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import Badge from '../components/Badge.jsx';
 import ProofModal from '../components/ProofModal.jsx';
 import CertificateModal from '../components/CertificateModal.jsx';
-import { useStaff, actions, TYPE_KEY } from '../data/store.js';
-import { REGISTRY, STATUS, PAYMENT_STATUS, CERT_LABELS, peso, fmtDate, fmtDateTime } from '../data/mock.js';
+import { useStaff, useRegistrySearch, actions, TYPE_KEY } from '../data/store.js';
+import { STATUS, PAYMENT_STATUS, CERT_LABELS, peso, fmtDate, fmtDateTime } from '../data/mock.js';
 import styles from '../styles/Staff.module.css';
 
 const FINAL = ['released', 'sent', 'rejected'];
@@ -29,6 +29,8 @@ export default function RequestDetailPage() {
   const [proofOpen, setProofOpen] = useState(false);
   const [certOpen, setCertOpen] = useState(false);
 
+  const matches = useRegistrySearch(req ? TYPE_KEY[req.certificate_type] : '', rq, req?.status === 'record_check');
+
   if (!req) {
     return (
       <div className={styles.card}>
@@ -47,10 +49,6 @@ export default function RequestDetailPage() {
   const idx = stepIndex(req);
   const STEPS = ['Submitted', 'Payment', 'Record', 'Certificate', digital ? 'Sent' : 'Released'];
   const isDone = (i) => i < idx || (idx === 4 && i === 4);
-
-  const matches = REGISTRY
-    .filter((x) => x.record_type === TYPE_KEY[req.certificate_type])
-    .filter((x) => !rq.trim() || x.full_name.toLowerCase().includes(rq.trim().toLowerCase()));
 
   return (
     <>
@@ -71,6 +69,17 @@ export default function RequestDetailPage() {
           </li>
         ))}
       </ol>
+
+      {req.duplicates > 0 && (
+        <p className={styles.note} style={{ marginBottom: '1rem' }}>
+          <b>Possible duplicate:</b> {req.duplicates} other request(s) with the same name, type, and email.
+        </p>
+      )}
+      {pay.proof?.duplicate && (
+        <p className={styles.note} style={{ marginBottom: '1rem' }}>
+          <b>Warning:</b> this exact proof file was already used in another request.
+        </p>
+      )}
 
       <div className={styles.cols}>
         <div className={styles.stack}>
@@ -158,7 +167,7 @@ export default function RequestDetailPage() {
                   {noRec ? (
                     <>
                       <button type="button" className={styles.btn} onClick={() => actions.confirmNoRecord(rid)}><i className="fa-solid fa-circle-check" /> No record found</button>
-                      <button type="button" className={styles.btnDanger} onClick={() => actions.move(rid, 'on_hold', 'A record exists in the registry. Needs review.')}><i className="fa-solid fa-triangle-exclamation" /> A record exists</button>
+                      <button type="button" className={styles.btnDanger} onClick={() => actions.hold(rid, 'A record exists in the registry. Needs review.')}><i className="fa-solid fa-triangle-exclamation" /> A record exists</button>
                     </>
                   ) : (
                     <button type="button" className={styles.btnDanger} onClick={() => actions.noRecord(rid)}><i className="fa-solid fa-circle-xmark" /> No matching record</button>
@@ -206,7 +215,7 @@ export default function RequestDetailPage() {
             <h2><i className="fa-solid fa-bolt" /> Actions</h2>
             <div className={styles.actions}>
               {req.status === 'submitted' && (
-                <button type="button" className={styles.btn} onClick={() => actions.move(rid, gcash ? 'payment_check' : 'record_check')}>
+                <button type="button" className={styles.btn} onClick={() => actions.start(rid)}>
                   <i className="fa-solid fa-play" /> {gcash ? 'Start payment check' : 'Start record check'}
                 </button>
               )}
@@ -214,15 +223,15 @@ export default function RequestDetailPage() {
               {req.status === 'record_check' && <p className={styles.note}>Find the record in the registry.</p>}
               {req.status === 'ready' && <p className={styles.note}>{iss ? (digital ? 'Send the e-certificate by email.' : 'Notify the requester, then release the hardcopy when claimed.') : 'Generate the certificate.'}</p>}
               {req.status === 'on_hold' && (
-                <button type="button" className={styles.btnGhost} onClick={() => actions.move(rid, pay.status === 'rejected' ? 'payment_check' : 'record_check')}>
+                <button type="button" className={styles.btnGhost} onClick={() => actions.resume(rid)}>
                   <i className="fa-solid fa-rotate-right" /> Resume request
                 </button>
               )}
               {!FINAL.includes(req.status) && req.status !== 'on_hold' && (
-                <button type="button" className={styles.btnGhost} onClick={() => actions.move(rid, 'on_hold')}><i className="fa-solid fa-pause" /> Put on hold</button>
+                <button type="button" className={styles.btnGhost} onClick={() => actions.hold(rid)}><i className="fa-solid fa-pause" /> Put on hold</button>
               )}
               {!FINAL.includes(req.status) && (
-                <button type="button" className={styles.btnDanger} onClick={() => actions.move(rid, 'rejected')}><i className="fa-solid fa-ban" /> Reject request</button>
+                <button type="button" className={styles.btnDanger} onClick={() => actions.reject(rid)}><i className="fa-solid fa-ban" /> Reject request</button>
               )}
               {FINAL.includes(req.status) && <p className={styles.note}>This request is closed.</p>}
             </div>

@@ -1,21 +1,58 @@
-// Backend-ready staff data access placeholder.
-// No sample records or in-memory mutations are used before the API is connected.
+// Staff data store — connected to the backend API for certificate requests.
+// Baptism and Mass stay stub until their endpoints are built.
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { CERT_LABELS, peso } from './mock.js';
 import { BAPTISM_TYPES, MASS_TYPES } from '../../../data/certificates.js';
 
 export const TYPE_KEY = { baptismal: 'baptism', confirmation: 'confirmation', marriage: 'marriage', no_record_baptism: 'baptism', no_record_confirmation: 'confirmation' };
 
-const EMPTY_STATE = {
-  requests: [],
-  baptisms: [],
-  masses: [],
-  events: {},
-  records: {},
-  issued: {},
-  emails: [],
+// ---- reactive state ----
+let state = {
+  requests: [], baptisms: [], masses: [], events: {}, records: {}, issued: {}, emails: [],
+  loading: false, error: '',
 };
+const listeners = new Set();
+const subscribe = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
+const setState = (patch) => { state = { ...state, ...patch }; listeners.forEach((fn) => fn()); };
+let started = false;
 
-export const useStaff = () => EMPTY_STATE;
+export async function refreshStaff() {
+  setState({ loading: true, error: '' });
+  try {
+    const res = await fetch('/api/staff/requests', { credentials: 'include' });
+    if (res.status === 401) { window.location.assign('/login'); return; }
+    if (!res.ok) throw new Error('request failed');
+    const d = await res.json();
+    setState({ requests: d.requests, events: d.events, issued: d.issued, records: d.records, emails: d.emails, loading: false });
+  } catch {
+    setState({ loading: false, error: 'Cannot load requests from the server.' });
+  }
+}
+
+export function useStaff() {
+  const s = useSyncExternalStore(subscribe, () => state);
+  useEffect(() => {
+    if (!started) { started = true; refreshStaff(); }
+  }, []);
+  return s;
+}
+
+// Registry search for the record check (debounced).
+export function useRegistrySearch(type, q, enabled) {
+  const [rows, setRows] = useState([]);
+  useEffect(() => {
+    if (!enabled) return undefined;
+    const ctl = new AbortController();
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/staff/registry?type=${type}&q=${encodeURIComponent(q.trim())}`, { credentials: 'include', signal: ctl.signal });
+        if (res.ok) setRows((await res.json()).records);
+      } catch { /* aborted or offline */ }
+    }, 250);
+    return () => { clearTimeout(t); ctl.abort(); };
+  }, [type, q, enabled]);
+  return rows;
+}
 
 // ---- helpers ----
 const longDay = (d) => (d ? new Date(`${d}T00:00:00`).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : '—');
@@ -30,7 +67,7 @@ export function buildEmail(req, issued, kind) {
       to: req.contact_email,
       subject: `Your ${label} E-Certificate (${req.reference_no})`,
       attachment: `${issued?.certificate_no || req.reference_no}.pdf`,
-      body: `Dear ${req.requester_name},\n\nThank you for your request. Attached is the e-certificate for ${req.subject_name}.\n\nCertificate no.: ${issued?.certificate_no}\nA verification link will be provided once the parish backend is connected.${sign}`,
+      body: `Dear ${req.requester_name},\n\nThank you for your request. Attached is the e-certificate for ${req.subject_name}.\n\nCertificate no.: ${issued?.certificate_no}\nYou can verify it by scanning the QR code on the certificate or by visiting olap.example/verify/${issued?.verify_token}.${sign}`,
     };
   }
   const due = req.payment.method === 'pickup' ? `Amount to pay upon pickup: ${peso(req.fee_amount)}.` : 'Your payment has been received.';
@@ -70,40 +107,53 @@ export function buildMassEmail(m, kind, sched, reason) {
   };
 }
 
-// ---- backend-dependent actions ----
-// Keep the staff UI intact, but never simulate database writes, approvals,
-// payment verification, certificate issuance, or email delivery.
+// ---- actions ----
+async function act(id, action, body = {}) {
+  try {
+    const res = await fetch(`/api/staff/requests/${id}/${action}`, {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (res.status === 401) { window.location.assign('/login'); return false; }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) window.alert(data.message || 'Action failed.');
+    await refreshStaff();
+    return res.ok;
+  } catch {
+    window.alert('Cannot reach the server. Nothing was changed.');
+    return false;
+  }
+}
+
+const ask = (msg) => { const v = window.prompt(msg); return v && v.trim() ? v.trim() : null; };
+
 const unavailable = () => {
   if (typeof window !== 'undefined') {
-    window.alert('This action is unavailable because the parish backend is not connected. No changes were saved and no email was sent.');
+    window.alert('This action is unavailable because the parish backend is not connected for this service yet. No changes were saved and no email was sent.');
   }
 };
 
 export const actions = {
-  move: unavailable,
-  verifyPayment: unavailable,
-  rejectPayment: unavailable,
-  confirmNoRecord: unavailable,
-  confirmRecord: unavailable,
-  noRecord: unavailable,
-  generate: unavailable,
-  sendEmail: unavailable,
-  release: unavailable,
+  // certificate requests (connected)
+  start: (id) => act(id, 'start'),
+  resume: (id) => act(id, 'resume'),
+  hold: (id, reason) => { const r = reason ?? ask('Reason for putting this request on hold (emailed to the requester):'); return r && act(id, 'hold', { reason: r }); },
+  reject: (id) => { const r = ask('Reason for rejecting this request (emailed to the requester):'); return r && act(id, 'reject', { reason: r }); },
+  verifyPayment: (id) => act(id, 'verify-payment'),
+  rejectPayment: (id, reason) => act(id, 'reject-payment', { reason }),
+  confirmRecord: (id, m) => act(id, 'confirm-record', { registry_record_id: m.id }),
+  noRecord: (id) => act(id, 'no-record'),
+  confirmNoRecord: (id) => act(id, 'confirm-no-record'),
+  generate: (id, signedBy) => act(id, 'generate', { signed_by: signedBy }),
+  sendEmail: (id, kind, mail) => act(id, kind === 'certificate' ? 'send-email' : 'notify-pickup', { subject: mail.subject, body: mail.body }),
+  release: (id) => { const n = ask('Name of the person who claimed the certificate (valid ID checked):'); return n && act(id, 'release', { claimed_by: n }); },
   retryEmail: unavailable,
 
-  createBaptism: unavailable,
-  verifyBaptismPayment: unavailable,
-  rejectBaptismPayment: unavailable,
-  holdBaptism: unavailable,
-  resumeBaptism: unavailable,
-  approveBaptism: unavailable,
-  rejectBaptism: unavailable,
-  completeBaptism: unavailable,
-
-  createMass: unavailable,
-  markMassPaid: unavailable,
-  rejectMassPayment: unavailable,
-  approveMass: unavailable,
-  rejectMass: unavailable,
-  completeMass: unavailable,
+  // baptism registration and mass intention (not connected yet)
+  createBaptism: unavailable, verifyBaptismPayment: unavailable, rejectBaptismPayment: unavailable,
+  holdBaptism: unavailable, resumeBaptism: unavailable, approveBaptism: unavailable,
+  rejectBaptism: unavailable, completeBaptism: unavailable,
+  createMass: unavailable, markMassPaid: unavailable, rejectMassPayment: unavailable,
+  approveMass: unavailable, rejectMass: unavailable, completeMass: unavailable,
 };

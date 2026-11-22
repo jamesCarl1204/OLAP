@@ -29,7 +29,7 @@ export default function CertificateModal({ id, onClose }) {
     issued_at: new Date().toISOString(),
   };
 
-  const send = () => { actions.sendEmail(id, mailKind); setMailKind(null); };
+  const send = () => { actions.sendEmail(id, mailKind, buildEmail(req, iss, mailKind)); setMailKind(null); };
 
   return (
     <>
