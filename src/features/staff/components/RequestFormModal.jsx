@@ -15,7 +15,6 @@ const Sect = ({ icon, children }) => (
   </h3>
 );
 
-// Staff reads the whole form the requester filled out, then approves, holds, or rejects.
 export default function RequestFormModal({ id, onClose }) {
   const { requests } = useStaff();
   const req = requests.find((r) => r.id === id);
