@@ -14,17 +14,25 @@ const NAV = [
   { to: '/staff/emails', label: 'Email Outbox', icon: 'fa-solid fa-envelope' },
 ];
 
-// TODO: replace the hard-coded name with the logged-in user.
 export default function StaffLayout() {
   const [open, setOpen] = useState(false);
-const { requests, issued, baptisms, masses } = useStaff();
-const counts = {
-  '/staff/payments': requests.filter((r) => r.status === 'payment_check').length,
-  '/staff/certificates': requests.filter((r) => r.status === 'ready' && !issued[r.id]).length,
-  '/staff/baptisms': baptisms.filter((b) => b.status === 'pending').length,
-  '/staff/masses': masses.filter((m) => m.status === 'pending').length,
-};
+  const { requests, issued, baptisms, masses } = useStaff();
+  const counts = {
+    '/staff/payments': requests.filter((r) => r.status === 'payment_check').length,
+    '/staff/certificates': requests.filter((r) => r.status === 'ready' && !issued[r.id]).length,
+    '/staff/baptisms': baptisms.filter((b) => b.status === 'pending').length,
+    '/staff/masses': masses.filter((m) => m.status === 'pending').length,
+  };
   const close = () => setOpen(false);
+
+  const signOut = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } finally {
+      // Full reload also clears the in-memory staff data.
+      window.location.assign('/login');
+    }
+  };
 
   return (
     <div className={styles.shell}>
@@ -48,7 +56,9 @@ const counts = {
           <span className={styles.avatar}>PS</span>
           <div>
             <strong>Parish Staff</strong>
-            <Link to="/login" onClick={close}><i className="fa-solid fa-right-from-bracket" /> Sign out</Link>
+            <a href="/login" onClick={(e) => { e.preventDefault(); signOut(); }}>
+              <i className="fa-solid fa-right-from-bracket" /> Sign out
+            </a>
           </div>
         </div>
       </aside>
@@ -61,7 +71,6 @@ const counts = {
             <i className="fa-solid fa-bars" />
           </button>
           <span className={styles.topTitle}>Our Lady of the Airways Parish</span>
-          <Link to="/" className={styles.site}><i className="fa-solid fa-arrow-up-right-from-square" /> Public site</Link>
         </header>
         <div className={styles.content}><Outlet /></div>
       </div>

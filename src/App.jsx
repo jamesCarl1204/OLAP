@@ -19,6 +19,7 @@ import BaptismRegistrationPage from './features/certificates/pages/BaptismRegist
 import MassIntentionPage from './features/certificates/pages/MassIntentionPage.jsx';
 import BaptismsPage from './features/staff/pages/BaptismPage.jsx';
 import MassIntentionsPage from './features/staff/pages/MassIntentionsPage.jsx';
+import ProtectedRoute from './features/auth/ProtectedRoute.jsx';
 
 function ScrollToHash() {
   const { pathname, hash } = useLocation();
@@ -46,18 +47,19 @@ export default function App() {
           <Route path="/register/mass-intention" element={<MassIntentionPage />} />
          </Route>
 
-        {/* Staff portal (sidebar layout). TODO: protect with login guard */}
+        {/* Staff portal (sidebar layout), protected */}
+     <Route element={<ProtectedRoute />}>
         <Route path="/staff" element={<StaffLayout />}>
-          <Route index element={<DashboardPage />} />
-          <Route path="requests" element={<RequestsPage />} />
-          <Route path="requests/:id" element={<RequestDetailPage />} />
-          <Route path="payments" element={<PaymentsPage />} />
-          <Route path="certificates" element={<CertificatesPage />} />
-          <Route path="records" element={<RecordsPage />} />
-          <Route path="emails" element={<EmailsPage />} />
-          <Route path="baptisms" element={<BaptismsPage />} />
-          <Route path="masses" element={<MassIntentionsPage />} />
-       
+        <Route index element={<DashboardPage />} />
+        <Route path="requests" element={<RequestsPage />} />
+        <Route path="requests/:id" element={<RequestDetailPage />} />
+        <Route path="payments" element={<PaymentsPage />} />
+        <Route path="certificates" element={<CertificatesPage />} />
+        <Route path="records" element={<RecordsPage />} />
+        <Route path="emails" element={<EmailsPage />} />
+        <Route path="baptisms" element={<BaptismsPage />} />
+        <Route path="masses" element={<MassIntentionsPage />} />
+        </Route>
         </Route>
       </Routes>
     </>
