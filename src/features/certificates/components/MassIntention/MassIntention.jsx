@@ -5,7 +5,7 @@ import base from '../BaptismalRequest/BaptismalRequest.module.css';
 import own from './MassIntention.module.css';
 const STEPS = ['Details', 'Type', 'Schedule', 'Payment', 'Done'];
 const TODAY = new Date().toISOString().slice(0, 10);
-const EMPTY = { requestor: '', phone: '', email: '', prayedFor: '', special: '' };
+const EMPTY = { requestor: '', phone: '', email: '', prayedFor: '', special: '', consent: false };
 const PAY_EMPTY = { method: '', gcashRef: '', proof: null };
 
 function Field({ label, hint, ...props }) {
@@ -18,7 +18,6 @@ function Field({ label, hint, ...props }) {
   );
 }
 
-// UI only. Wire up the real API (create request, upload receipt, get reference no.) later.
 export default function MassIntention() {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(EMPTY);
@@ -27,6 +26,7 @@ export default function MassIntention() {
   const [pay, setPay] = useState(PAY_EMPTY);
   const [error, setError] = useState('');
   const [refNo, setRefNo] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const type = MASS_TYPES.find((t) => t.id === typeId);
 
@@ -39,6 +39,7 @@ export default function MassIntention() {
     e.preventDefault();
     if (!/^(09|\+639)\d{9}$/.test(form.phone.replace(/[\s-]/g, '')))
       return setError('Enter a valid mobile number, e.g. 0917 123 4567.');
+    if (!form.consent) return setError('Please agree to the data privacy notice to continue.');
     go(2);
   };
 
@@ -69,15 +70,47 @@ export default function MassIntention() {
     setPay({ ...pay, proof: file });
   };
 
-  const submitRequest = (e) => {
-  e.preventDefault();
-  if (!pay.method) return setError('Select a payment method.');
-  if (pay.method === 'gcash') {
-    if (!pay.gcashRef.trim()) return setError('Enter your GCash reference number.');
-    if (!pay.proof) return setError('Upload your GCash payment receipt (screenshot).');
-  }
-  setError('Request submission is unavailable until the parish backend is connected. Your information has not been submitted.');
-};
+  const submitRequest = async (e) => {
+    e.preventDefault();
+    if (submitting) return;
+    if (!pay.method) return setError('Select a payment method.');
+    if (pay.method === 'gcash') {
+      if (!pay.gcashRef.trim()) return setError('Enter your GCash reference number.');
+      if (!pay.proof) return setError('Upload your GCash payment receipt (screenshot).');
+    }
+
+    setError('');
+    setSubmitting(true);
+    try {
+      const fd = new FormData();
+      fd.append('requestor', form.requestor);
+      fd.append('phone', form.phone);
+      fd.append('email', form.email);
+      fd.append('prayedFor', form.prayedFor);
+      fd.append('special', form.special);
+      fd.append('consent', String(form.consent));
+      fd.append('typeId', typeId);
+      fd.append('date', sched.date);
+      fd.append('time', sched.time);
+      fd.append('method', pay.method);
+      if (pay.method === 'gcash') {
+        fd.append('gcashRef', pay.gcashRef);
+        fd.append('proof', pay.proof);
+      }
+
+      const res = await fetch('/api/requests/mass-intention', { method: 'POST', body: fd });
+      let data = {};
+      try { data = await res.json(); } catch { /* non-JSON response */ }
+
+      if (!res.ok) return setError(data.message || 'Could not submit your request. Please try again.');
+      setRefNo(data.reference_no);
+      go(5);
+    } catch {
+      setError('Cannot reach the server. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className={base.card}>
@@ -116,6 +149,12 @@ export default function MassIntention() {
             </label>
             <p className={base.note}>The type of Mass Intention, preferred date, and Mass time are chosen on the next screens.</p>
           </fieldset>
+
+          <label className={base.consent}>
+            <input type="checkbox" checked={form.consent} onChange={(e) => setForm({ ...form, consent: e.target.checked })} />
+            <span>I agree that the parish may use these details to process this request. {/* TODO: final privacy notice wording */}</span>
+          </label>
+
           <div className={base.actions}>
             <Link to="/" className={base.back}>Cancel</Link>
             <button type="submit" className={base.primary}>Continue</button>
@@ -211,8 +250,10 @@ export default function MassIntention() {
           )}
 
           <div className={base.actions}>
-            <button type="button" className={base.back} onClick={() => go(3)}>Back</button>
-            <button type="submit" className={base.primary}>Submit request</button>
+            <button type="button" className={base.back} onClick={() => go(3)} disabled={submitting}>Back</button>
+            <button type="submit" className={base.primary} disabled={submitting}>
+              {submitting ? 'Submitting...' : 'Submit request'}
+            </button>
           </div>
         </form>
       )}

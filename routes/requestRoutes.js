@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
-import { handleUpload } from '../middleware/uploadProof.js';
-import { createBaptismal, createConfirmation } from '../controllers/requestController.js';
+import { handleUpload, handleBaptismUploads } from '../middleware/uploadProof.js';
+import { createBaptismal, createConfirmation, createNoRecord } from '../controllers/requestController.js';
+import { createRegistration } from '../controllers/baptismController.js';
+import { createMass } from '../controllers/massController.js';
 
 const router = Router();
 const submitLimiter = rateLimit({
@@ -11,5 +13,8 @@ const submitLimiter = rateLimit({
 
 router.post('/baptismal', submitLimiter, handleUpload, createBaptismal);
 router.post('/confirmation', submitLimiter, handleUpload, createConfirmation);
+router.post('/no-record/:kind', submitLimiter, handleUpload, createNoRecord);
+router.post('/baptism-registration', submitLimiter, handleBaptismUploads, createRegistration);
+router.post('/mass-intention', submitLimiter, handleUpload, createMass);
 
 export default router;
