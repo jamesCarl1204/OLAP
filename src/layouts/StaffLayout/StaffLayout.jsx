@@ -10,18 +10,20 @@ const NAV = [
   { to: '/staff/certificates', label: 'Certificates', icon: 'fa-solid fa-stamp' },
   { to: '/staff/baptisms', label: 'Baptisms', icon: 'fa-solid fa-water' },
   { to: '/staff/masses', label: 'Mass Intentions', icon: 'fa-solid fa-hands-praying' },
+  { to: '/staff/marriages', label: 'Marriage Bookings', icon: 'fa-solid fa-ring' },
   { to: '/staff/records', label: 'Records', icon: 'fa-solid fa-book-bible' },
   { to: '/staff/emails', label: 'Email Outbox', icon: 'fa-solid fa-envelope' },
 ];
 
 export default function StaffLayout() {
   const [open, setOpen] = useState(false);
-  const { requests, issued, baptisms, masses } = useStaff();
+  const { requests, issued, baptisms, masses, marriages } = useStaff();
   const counts = {
     '/staff/payments': requests.filter((r) => r.status === 'payment_check').length,
     '/staff/certificates': requests.filter((r) => r.status === 'ready' && !issued[r.id]).length,
     '/staff/baptisms': baptisms.filter((b) => b.status === 'pending').length,
     '/staff/masses': masses.filter((m) => m.status === 'pending').length,
+    '/staff/marriages': marriages.filter((m) => m.status === 'pending').length,
   };
   const close = () => setOpen(false);
 
