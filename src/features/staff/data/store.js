@@ -8,7 +8,7 @@ export const TYPE_KEY = { baptismal: 'baptism', confirmation: 'confirmation', ma
 
 // ---- reactive state ----
 let state = {
-  requests: [], baptisms: [], masses: [], events: {}, records: {}, issued: {}, emails: [],
+  requests: [], baptisms: [], masses: [], marriages: [], events: {}, marriageEvents: {}, records: {}, issued: {}, emails: [],
   loading: false, error: '',
 };
 const listeners = new Set();
@@ -49,6 +49,21 @@ export async function refreshBaptisms() {
   }
 }
 
+
+export async function refreshMarriages() {
+  try {
+    const res = await fetch('/api/staff/marriages', { credentials: 'include' });
+    if (res.status === 401) { window.location.assign('/login'); return; }
+    if (!res.ok) throw new Error('request failed');
+    const d = await res.json();
+    const marriages = Array.isArray(d.marriages) ? d.marriages : [];
+    const marriageEvents = d.events && typeof d.events === 'object' ? d.events : {};
+    setState({ marriages, marriageEvents });
+  } catch {
+    setState({ error: 'Cannot load marriage bookings from the server.' });
+  }
+}
+
 export async function refreshMasses() {
   try {
     const res = await fetch('/api/staff/masses', { credentials: 'include' });
@@ -65,7 +80,7 @@ export async function refreshMasses() {
 export function useStaff() {
   const s = useSyncExternalStore(subscribe, () => state);
   useEffect(() => {
-    if (!started) { started = true; refreshStaff(); refreshBaptisms(); refreshMasses(); }
+    if (!started) { started = true; refreshStaff(); refreshBaptisms(); refreshMasses(); refreshMarriages(); }
   }, []);
   return s;
 }
