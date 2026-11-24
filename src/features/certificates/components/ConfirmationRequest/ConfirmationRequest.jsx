@@ -33,7 +33,7 @@ export default function ConfirmationRequest() {
   const [pay, setPay] = useState(PAY_EMPTY);
   const [error, setError] = useState('');
   const [refNo, setRefNo] = useState('');
-
+const [submitting, setSubmitting] = useState(false);
   // The fee depends on the purpose, not on the format.
   const purpose = CONFIRMATION_PURPOSES.find((p) => p.id === form.purposeId);
 
@@ -72,12 +72,45 @@ export default function ConfirmationRequest() {
     setPay({ ...pay, proof: file });
   };
 
-  const submitRequest = (e) => {
-    e.preventDefault();
-    if (!pay.method) return setError('Select a payment method.');
-    if (pay.method === 'gcash' && !pay.proof) return setError('Upload your proof of payment.');
-    setError('Request submission is unavailable until the parish backend is connected. Your information has not been submitted.');
-  };
+  const submitRequest = async (e) => {
+  e.preventDefault();
+  if (submitting) return;
+  if (!pay.method) return setError('Select a payment method.');
+  if (pay.method === 'gcash' && !pay.proof) return setError('Upload your proof of payment.');
+
+  setError('');
+  setSubmitting(true);
+  try {
+    const fd = new FormData();
+    fd.append('format', format.id);
+    fd.append('fullName', form.fullName);
+    fd.append('father', form.father);
+    fd.append('mother', form.mother);
+    fd.append('confirmationDate', form.confirmationDate);
+    fd.append('purposeId', form.purposeId);
+    fd.append('email', form.email);
+    fd.append('phone', form.phone);
+    fd.append('consent', String(form.consent));
+    fd.append('method', pay.method);
+    if (pay.method === 'gcash') {
+      fd.append('gcashNumber', pay.gcashNumber);
+      fd.append('gcashName', pay.gcashName);
+      fd.append('proof', pay.proof);
+    }
+
+    const res = await fetch('/api/requests/confirmation', { method: 'POST', body: fd });
+    let data = {};
+    try { data = await res.json(); } catch { /* non-JSON response */ }
+
+    if (!res.ok) return setError(data.message || 'Could not submit your request. Please try again.');
+    setRefNo(data.reference_no);
+    go(4);
+  } catch {
+    setError('Cannot reach the server. Please try again.');
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   return (
     <div className={styles.card}>
@@ -190,8 +223,10 @@ export default function ConfirmationRequest() {
           )}
 
           <div className={styles.actions}>
-            <button type="button" className={styles.back} onClick={() => go(2)}>Back</button>
-            <button type="submit" className={styles.primary}>Submit request</button>
+         <button type="button" className={styles.back} onClick={() => go(2)} disabled={submitting}>Back</button>
+        <button type="submit" className={styles.primary} disabled={submitting}>
+         {submitting ? 'Submitting...' : 'Submit request'}
+         </button>
           </div>
         </form>
       )}
