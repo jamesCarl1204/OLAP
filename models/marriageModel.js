@@ -58,3 +58,27 @@ export async function createMarriageBooking({ code, type, data, docs, proof, pay
     c.release();
   }
 }
+
+// Staff list: bookings + payment + proof, documents, and activity.
+export async function listBookings() {
+  const [rows] = await pool.query(
+    `SELECT m.*, p.method AS pay_method, p.status AS pay_status,
+            p.sender_gcash_number, p.sender_account_name, p.reject_reason AS pay_reject_reason,
+            f.id AS proof_id, f.original_name AS proof_name, f.mime_type AS proof_mime,
+            f.size_bytes AS proof_size, f.uploaded_at AS proof_uploaded_at
+     FROM marriage_bookings m
+     LEFT JOIN payments p ON p.marriage_id = m.id
+     LEFT JOIN files f ON f.id = p.proof_file_id
+     ORDER BY m.submitted_at DESC`);
+
+  const [docs] = await pool.query(
+    `SELECT d.marriage_id, d.doc_type, f.id AS file_id, f.original_name
+     FROM marriage_documents d JOIN files f ON f.id = d.file_id`);
+
+  const [events] = await pool.query(
+    `SELECT e.marriage_id, e.note, e.created_at, u.full_name
+     FROM request_events e LEFT JOIN users u ON u.id = e.actor_user_id
+     WHERE e.marriage_id IS NOT NULL ORDER BY e.created_at, e.id`);
+
+  return { rows, docs, events };
+}

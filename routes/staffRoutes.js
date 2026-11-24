@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { requireAuth, requireRole } from '../middleware/authMiddleware.js';
 import { listRequests, listBaptisms, listMasses, searchRegistry, act, getFile } from '../controllers/staffController.js';
+import { listMarriages } from '../controllers/marriageController.js';
 
 const router = Router();
 router.use(requireAuth, requireRole('admin', 'staff'));
@@ -11,5 +12,6 @@ router.get('/masses', listMasses);
 router.get('/registry', searchRegistry);
 router.post('/requests/:id/:action', act);
 router.get('/files/:id', getFile);
+router.get('/marriages', listMarriages);
 
 export default router;
