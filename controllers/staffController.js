@@ -132,3 +132,153 @@ export async function getFile(req, res) {
     if (err && !res.headersSent) res.status(404).json({ message: 'File not found.' });
   });
 }
+
+
+const ymd = (d) => {
+  if (!(d instanceof Date)) return d ?? null;
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+};
+const MARRIAGE_LABEL = { catholic: 'Catholic', non_catholic: 'Non-Catholic', civil: 'Civil' };
+const DOC_KEY = { birth_certificate: 'birth', marriage_contract: 'marriage', no_record: 'noRecord' };
+
+export async function listBaptisms(_req, res) {
+  const [rows] = await pool.query(
+    `SELECT b.*, t.code AS type_code,
+            p.method AS pay_method, p.status AS pay_status, p.sender_gcash_number, p.sender_account_name,
+            p.reject_reason AS pay_reject_reason,
+            f.id AS proof_id, f.original_name AS proof_name, f.mime_type AS proof_mime,
+            f.size_bytes AS proof_size, f.uploaded_at AS proof_uploaded_at
+     FROM baptism_registrations b
+     JOIN baptism_types t ON t.id = b.baptism_type_id
+     LEFT JOIN payments p ON p.baptism_id = b.id
+     LEFT JOIN files f ON f.id = p.proof_file_id
+     ORDER BY b.submitted_at DESC`);
+
+  const [spons] = await pool.query('SELECT baptism_id, full_name, address FROM baptism_sponsors ORDER BY baptism_id, position');
+  const sponsorsOf = {};
+  for (const s of spons) (sponsorsOf[s.baptism_id] ||= []).push({ name: s.full_name, address: s.address });
+
+  const [docs] = await pool.query(
+    `SELECT d.baptism_id, d.doc_type, f.id AS file_id, f.original_name
+     FROM baptism_documents d JOIN files f ON f.id = d.file_id`);
+  const filesOf = {};
+  for (const d of docs) (filesOf[d.baptism_id] ||= []).push({
+    key: DOC_KEY[d.doc_type], name: d.original_name, url: `/api/staff/files/${d.file_id}`,
+  });
+
+  const [evts] = await pool.query(
+    `SELECT e.baptism_id, e.note, e.created_at, u.full_name
+     FROM request_events e LEFT JOIN users u ON u.id = e.actor_user_id
+     WHERE e.baptism_id IS NOT NULL ORDER BY e.created_at, e.id`);
+  const events = {};
+  for (const e of evts) (events[`b${e.baptism_id}`] ||= []).push({ note: e.note, actor: e.full_name || 'Requester', at: e.created_at });
+
+  const baptisms = rows.map((r) => ({
+    id: r.id,
+    reference_no: r.reference_no,
+    type_id: r.type_code,
+    status: r.status,
+    date: ymd(r.requested_date),
+    time: r.requested_time,
+    confirmed_date: ymd(r.confirmed_date) || ymd(r.requested_date),
+    confirmed_time: r.confirmed_time || r.requested_time,
+    child: { given: r.child_given, middle: r.child_middle, surname: r.child_surname, dob: ymd(r.child_birth_date), pob: r.child_birth_place },
+    father: { name: r.father_name, pob: r.father_birth_place },
+    mother: { name: r.mother_name, pob: r.mother_birth_place },
+    marriage_kind: MARRIAGE_LABEL[r.marriage_kind],
+    venue: r.marriage_venue,
+    address: r.parents_address,
+    email: r.contact_email,
+    phone: r.contact_phone,
+    married_legally: !!r.married_legally,
+    late_birth_reg: !!r.late_birth_reg,
+    parent_name: r.parent_print_name,
+    sponsors: sponsorsOf[r.id] || [],
+    files: filesOf[r.id] || [],
+    fee_total: Number(r.fee_total),
+    reject_reason: r.reject_reason,
+    submitted_at: r.submitted_at,
+    payment: {
+      method: r.pay_method,
+      status: r.pay_status,
+      sender_gcash_number: r.sender_gcash_number,
+      sender_account_name: r.sender_account_name,
+      reject_reason: r.pay_reject_reason,
+      proof: r.proof_id ? {
+        type: r.proof_mime?.startsWith('image/') ? 'image' : 'pdf',
+        url: `/api/staff/files/${r.proof_id}`,
+        name: r.proof_name,
+        size_kb: Math.max(1, Math.round(r.proof_size / 1024)),
+        uploaded_at: r.proof_uploaded_at,
+      } : null,
+    },
+    staff: {
+      priest: r.baptized_by, received_by: r.received_by_name,
+      book: r.book_no, page: r.page_no, line: r.line_no, stipend: r.stipend_received,
+    },
+  }));
+
+  res.json({ baptisms, events });
+}
+
+// Staff UI uses these payment labels for Mass Intentions.
+const massPayStatus = (method, status) => {
+  if (status === 'verified') return 'paid';
+  if (status === 'rejected') return 'rejected';
+  return method === 'gcash' ? 'for_verification' : 'pending_payment';
+};
+
+export async function listMasses(_req, res) {
+  const [rows] = await pool.query(
+    `SELECT m.*, t.code AS type_code,
+            p.method AS pay_method, p.status AS pay_status, p.gcash_reference_no,
+            p.reject_reason AS pay_reject_reason,
+            f.id AS proof_id, f.original_name AS proof_name, f.mime_type AS proof_mime,
+            f.size_bytes AS proof_size, f.uploaded_at AS proof_uploaded_at
+     FROM mass_intentions m
+     JOIN mass_intention_types t ON t.id = m.mass_type_id
+     LEFT JOIN payments p ON p.mass_id = m.id
+     LEFT JOIN files f ON f.id = p.proof_file_id
+     ORDER BY m.submitted_at DESC`);
+
+  const [evts] = await pool.query(
+    `SELECT e.mass_id, e.note, e.created_at, u.full_name
+     FROM request_events e LEFT JOIN users u ON u.id = e.actor_user_id
+     WHERE e.mass_id IS NOT NULL ORDER BY e.created_at, e.id`);
+  const events = {};
+  for (const e of evts) (events[`m${e.mass_id}`] ||= []).push({ note: e.note, actor: e.full_name || 'Requester', at: e.created_at });
+
+  const masses = rows.map((r) => ({
+    id: r.id,
+    reference_no: r.reference_no,
+    type_id: r.type_code,
+    status: r.status,
+    requestor: r.requestor_name,
+    phone: r.contact_phone,
+    email: r.contact_email,
+    prayed_for: r.prayed_for,
+    special: r.special_requests,
+    date: ymd(r.requested_date),
+    time: r.requested_time,
+    confirmed_date: ymd(r.confirmed_date) || ymd(r.requested_date),
+    confirmed_time: r.confirmed_time || r.requested_time,
+    reject_reason: r.reject_reason,
+    submitted_at: r.submitted_at,
+    payment: {
+      method: r.pay_method,
+      status: massPayStatus(r.pay_method, r.pay_status),
+      gcash_ref: r.gcash_reference_no,
+      reject_reason: r.pay_reject_reason,
+      proof: r.proof_id ? {
+        type: r.proof_mime?.startsWith('image/') ? 'image' : 'pdf',
+        url: `/api/staff/files/${r.proof_id}`,
+        name: r.proof_name,
+        size_kb: Math.max(1, Math.round(r.proof_size / 1024)),
+        uploaded_at: r.proof_uploaded_at,
+      } : null,
+    },
+  }));
+
+  res.json({ masses, events });
+}

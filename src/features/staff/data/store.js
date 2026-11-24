@@ -1,5 +1,5 @@
-// Staff data store — connected to the backend API for certificate requests.
-// Baptism and Mass stay stub until their endpoints are built.
+// Staff data store — connected to the backend API for certificate requests, baptism registrations, and Mass Intentions.
+// Staff actions for baptism and Mass stay stub until their endpoints are built.
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { CERT_LABELS, peso } from './mock.js';
 import { BAPTISM_TYPES, MASS_TYPES } from '../../../data/certificates.js';
@@ -16,6 +16,12 @@ const subscribe = (fn) => { listeners.add(fn); return () => listeners.delete(fn)
 const setState = (patch) => { state = { ...state, ...patch }; listeners.forEach((fn) => fn()); };
 let started = false;
 
+// Events are keyed differently per module (request id, "b<id>", "m<id>"). Kept apart so one refresh never wipes another.
+let certEvents = {};
+let bapEvents = {};
+let massEvents = {};
+const allEvents = () => ({ ...certEvents, ...bapEvents, ...massEvents });
+
 export async function refreshStaff() {
   setState({ loading: true, error: '' });
   try {
@@ -23,16 +29,43 @@ export async function refreshStaff() {
     if (res.status === 401) { window.location.assign('/login'); return; }
     if (!res.ok) throw new Error('request failed');
     const d = await res.json();
-    setState({ requests: d.requests, events: d.events, issued: d.issued, records: d.records, emails: d.emails, loading: false });
+    certEvents = d.events;
+    setState({ requests: d.requests, events: allEvents(), issued: d.issued, records: d.records, emails: d.emails, loading: false });
   } catch {
     setState({ loading: false, error: 'Cannot load requests from the server.' });
+  }
+}
+
+export async function refreshBaptisms() {
+  try {
+    const res = await fetch('/api/staff/baptisms', { credentials: 'include' });
+    if (res.status === 401) { window.location.assign('/login'); return; }
+    if (!res.ok) throw new Error('request failed');
+    const d = await res.json();
+    bapEvents = d.events;
+    setState({ baptisms: d.baptisms, events: allEvents() });
+  } catch {
+    setState({ error: 'Cannot load baptism registrations from the server.' });
+  }
+}
+
+export async function refreshMasses() {
+  try {
+    const res = await fetch('/api/staff/masses', { credentials: 'include' });
+    if (res.status === 401) { window.location.assign('/login'); return; }
+    if (!res.ok) throw new Error('request failed');
+    const d = await res.json();
+    massEvents = d.events;
+    setState({ masses: d.masses, events: allEvents() });
+  } catch {
+    setState({ error: 'Cannot load Mass Intentions from the server.' });
   }
 }
 
 export function useStaff() {
   const s = useSyncExternalStore(subscribe, () => state);
   useEffect(() => {
-    if (!started) { started = true; refreshStaff(); }
+    if (!started) { started = true; refreshStaff(); refreshBaptisms(); refreshMasses(); }
   }, []);
   return s;
 }
@@ -150,7 +183,7 @@ export const actions = {
   release: (id) => { const n = ask('Name of the person who claimed the certificate (valid ID checked):'); return n && act(id, 'release', { claimed_by: n }); },
   retryEmail: unavailable,
 
-  // baptism registration and mass intention (not connected yet)
+  // baptism registration and mass intention staff actions (not connected yet)
   createBaptism: unavailable, verifyBaptismPayment: unavailable, rejectBaptismPayment: unavailable,
   holdBaptism: unavailable, resumeBaptism: unavailable, approveBaptism: unavailable,
   rejectBaptism: unavailable, completeBaptism: unavailable,

@@ -10,6 +10,7 @@ const bad = (message) => { throw new ValidationError(message); };
 
 // TODO: keep fees in sync with src/data/certificates.js (the server decides the fee, never the client).
 const BAPTISMAL_FEE = 100;
+const NO_RECORD_FEE = 100;
 const CONFIRMATION_PURPOSES = {
   records: { label: 'Records / Personal Copy', fee: 100 },
   marriage: { label: 'Marriage', fee: 200 },
@@ -78,9 +79,38 @@ function parseConfirmation(b) {
   };
 }
 
+// Certificate of No Record. Only the baptism form asks for date / place of birth.
+const parseNoRecord = (askBirth) => (b) => {
+  const fullName = upper(b.fullName);
+  const father = upper(b.father);
+  const mother = upper(b.mother);
+  const church = upper(b.church);
+  const city = upper(b.city);
+  const requester = upper(b.requester);
+  const dob = askBirth ? text(b.dob, 10) : null;
+  const pob = askBirth ? upper(b.pob) : null;
+
+  if (!fullName || !father || !mother) bad('Complete the name and the names of the parents.');
+  if (!church || !city) bad('Enter the destination church and city.');
+  if (!requester) bad("Enter the requester's full name.");
+  if (askBirth) {
+    if (!validDate(dob) || dob > todayStr()) bad('Enter a valid date of birth.');
+    if (!pob) bad('Enter the place of birth.');
+  }
+
+  return {
+    subject_name: fullName, father_name: father, mother_name: mother,
+    birth_date: dob, birth_place: pob, event_date: null, purpose: null,
+    destination_church: church, destination_city: city, requester_name: requester,
+    fee: NO_RECORD_FEE,
+  };
+};
+
 const KINDS = {
   baptismal: { code: REF_CODES.baptismal, parse: parseBaptismal },
   confirmation: { code: REF_CODES.confirmation, parse: parseConfirmation },
+  no_record_baptism: { code: REF_CODES.no_record_baptism, parse: parseNoRecord(true) },
+  no_record_confirmation: { code: REF_CODES.no_record_confirmation, parse: parseNoRecord(false) },
 };
 
 // ---- shared rules: contact, consent, format, payment, proof ----
@@ -124,7 +154,7 @@ async function storeProof(file, proofType) {
 }
 
 // ---- entry point used by the controller ----
-// kind: 'baptismal' | 'confirmation'. Returns the reference number.
+// kind: 'baptismal' | 'confirmation' | 'no_record_baptism' | 'no_record_confirmation'. Returns the reference number.
 export async function submitCertificateRequest(kind, body, file) {
   const cfg = KINDS[kind];
   if (!cfg) throw new Error(`Unknown request kind: ${kind}`);

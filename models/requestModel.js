@@ -12,12 +12,13 @@ export async function createCertificateRequest({ type, code, person, contact, pa
     const [r] = await c.query(
       `INSERT INTO certificate_requests
         (reference_no, certificate_type, format, subject_name, father_name, mother_name,
-         birth_date, birth_place, event_date, purpose, requester_name, contact_email, contact_phone,
-         fee_amount, consent_at, consent_version)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),?)`,
+         birth_date, birth_place, event_date, purpose, destination_church, destination_city,
+         requester_name, contact_email, contact_phone, fee_amount, consent_at, consent_version)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),?)`,
       [referenceNo, type, contact.format, person.subject_name, person.father_name, person.mother_name,
        person.birth_date, person.birth_place, person.event_date, person.purpose,
-       person.subject_name, contact.email, contact.phone, person.fee, consentVersion]);
+       person.destination_church ?? null, person.destination_city ?? null,
+       person.requester_name ?? person.subject_name, contact.email, contact.phone, person.fee, consentVersion]);
 
     let fileId = null;
     if (file) {

@@ -43,7 +43,6 @@ function Field({ label, hint, ...props }) {
   );
 }
 
-// UI only. Wire up the real API (create request, upload files, get reference no.) later.
 export default function BaptismRegistration() {
   const [step, setStep] = useState(1);
   const [sched, setSched] = useState(SCHEDULE_EMPTY);
@@ -52,6 +51,7 @@ export default function BaptismRegistration() {
   const [pay, setPay] = useState(PAY_EMPTY);
   const [error, setError] = useState('');
   const [refNo, setRefNo] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const type = BAPTISM_TYPES.find((t) => t.id === sched.typeId);
   const fee = type ? baptismFee(type, form.sponsors.length) : null;
@@ -122,12 +122,61 @@ export default function BaptismRegistration() {
     setPay({ ...pay, proof: file });
   };
 
-  const submitRequest = (e) => {
-  e.preventDefault();
-  if (!pay.method) return setError('Select a payment method.');
-  if (pay.method === 'gcash' && !pay.proof) return setError('Upload your proof of payment.');
-  setError('Registration submission is unavailable until the parish backend is connected. Your information has not been submitted.');
-};
+  const submitRequest = async (e) => {
+    e.preventDefault();
+    if (submitting) return;
+    if (!pay.method) return setError('Select a payment method.');
+    if (pay.method === 'gcash' && !pay.proof) return setError('Upload your proof of payment.');
+
+    setError('');
+    setSubmitting(true);
+    try {
+      const fd = new FormData();
+      fd.append('typeId', sched.typeId);
+      fd.append('date', sched.date);
+      fd.append('time', sched.time);
+      fd.append('surname', form.surname);
+      fd.append('given', form.given);
+      fd.append('middle', form.middle);
+      fd.append('dob', form.dob);
+      fd.append('pob', form.pob);
+      fd.append('father', form.father);
+      fd.append('fatherPob', form.fatherPob);
+      fd.append('mother', form.mother);
+      fd.append('motherPob', form.motherPob);
+      fd.append('marriageKind', form.marriageKind);
+      fd.append('venue', form.venue);
+      fd.append('address', form.address);
+      fd.append('marriedLegally', String(form.marriedLegally));
+      fd.append('lateBirthReg', String(form.lateBirthReg));
+      fd.append('sponsors', JSON.stringify(form.sponsors));
+      fd.append('email', form.email);
+      fd.append('phone', form.phone);
+      fd.append('conforme', String(form.conforme));
+      fd.append('parentName', form.parentName);
+      fd.append('method', pay.method);
+      if (files.birth) fd.append('birth', files.birth);
+      if (files.marriage) fd.append('marriage', files.marriage);
+      if (files.noRecord) fd.append('noRecord', files.noRecord);
+      if (pay.method === 'gcash') {
+        fd.append('gcashNumber', pay.gcashNumber);
+        fd.append('gcashName', pay.gcashName);
+        fd.append('proof', pay.proof);
+      }
+
+      const res = await fetch('/api/requests/baptism-registration', { method: 'POST', body: fd });
+      let data = {};
+      try { data = await res.json(); } catch { /* non-JSON response */ }
+
+      if (!res.ok) return setError(data.message || 'Could not submit your registration. Please try again.');
+      setRefNo(data.reference_no);
+      go(6);
+    } catch {
+      setError('Cannot reach the server. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className={base.card}>
@@ -364,8 +413,10 @@ export default function BaptismRegistration() {
           )}
 
           <div className={base.actions}>
-            <button type="button" className={base.back} onClick={() => go(4)}>Back</button>
-            <button type="submit" className={base.primary}>Submit request</button>
+            <button type="button" className={base.back} onClick={() => go(4)} disabled={submitting}>Back</button>
+            <button type="submit" className={base.primary} disabled={submitting}>
+              {submitting ? 'Submitting...' : 'Submit request'}
+            </button>
           </div>
         </form>
       )}
