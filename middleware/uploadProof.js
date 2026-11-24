@@ -24,3 +24,14 @@ export const handleBaptismUploads = wrap(
     { name: 'noRecord', maxCount: 1 },
     { name: 'proof', maxCount: 1 },
   ]));
+
+  // Marriage booking: five requirement documents + one proof of payment.
+export const handleMarriageUploads = wrap(
+  multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_BYTES, files: 6 } }).fields([
+    { name: 'groomBaptism', maxCount: 1 },
+    { name: 'groomConfirmation', maxCount: 1 },
+    { name: 'brideBaptism', maxCount: 1 },
+    { name: 'brideConfirmation', maxCount: 1 },
+    { name: 'license', maxCount: 1 },
+    { name: 'proof', maxCount: 1 },
+  ]));

@@ -93,3 +93,29 @@ export const MASS_TYPES = [
 // TODO: Mass times and the offering amount must come from the parish. Placeholders only.
 export const MASS_TIMES = ['[Mass time 1]', '[Mass time 2]', '[Mass time 3]'];
 export const MASS_OFFERING_NOTE = 'The offering amount is set by the parish.';
+
+// ---- Marriage Booking (per parish info; confirm times with the parish) ----
+export const MARRIAGE_TYPES = [
+  { id: 'ordinary', title: 'Ordinary Marriage', fee: 10000, desc: 'Marriage ceremony (1 hour).' },
+  { id: 'special', title: 'Special Marriage', fee: 15000, desc: 'Marriage ceremony (1 hour) with flowers and singer.' },
+];
+// TODO: real wedding time slots from the parish. Placeholders only.
+export const MARRIAGE_TIMES = ['[Time 1]', '[Time 2]', '[Time 3]'];
+export const MARRIAGE_REQUIREMENTS = [
+  "New copy of the Baptismal Certificate of the groom and the bride, with Annotation for Marriage Purposes.",
+  "New copy of the Confirmation Certificate of the groom and the bride, with Annotation for Marriage Purposes.",
+  'Marriage License, to be obtained from the Civil Registry of the city or town of either the bride or the groom.',
+];
+export const MARRIAGE_REMINDERS = [
+  'The wedding must be booked at least one (1) month before the wedding date.',
+  'Each wedding lasts one (1) hour.',
+  'The requested schedule is not confirmed until the Parish Office approves it.',
+  'All requirements must be submitted. NO REQUIREMENTS, NO WEDDING.',
+];
+// Earliest allowed wedding date: today + 1 month (local time, YYYY-MM-DD).
+export function marriageMinDate() {
+  const d = new Date();
+  d.setMonth(d.getMonth() + 1);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}

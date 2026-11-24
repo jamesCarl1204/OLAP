@@ -20,6 +20,7 @@ import MassIntentionPage from './features/certificates/pages/MassIntentionPage.j
 import BaptismsPage from './features/staff/pages/BaptismPage.jsx';
 import MassIntentionsPage from './features/staff/pages/MassIntentionsPage.jsx';
 import ProtectedRoute from './features/auth/ProtectedRoute.jsx';
+import MarriageBookingPage from './features/certificates/pages/MarriageBookingPage.jsx';
 
 function ScrollToHash() {
   const { pathname, hash } = useLocation();
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="/request/no-record/:kind" element={<NoRecordRequestPage />} /> 
           <Route path="/register/baptism" element={<BaptismRegistrationPage />} />
           <Route path="/register/mass-intention" element={<MassIntentionPage />} />
+          <Route path="/register/marriage" element={<MarriageBookingPage />} />
          </Route>
 
         {/* Staff portal (sidebar layout), protected */}
