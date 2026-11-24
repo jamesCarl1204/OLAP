@@ -19,6 +19,7 @@ import BaptismRegistrationPage from './features/certificates/pages/BaptismRegist
 import MassIntentionPage from './features/certificates/pages/MassIntentionPage.jsx';
 import BaptismsPage from './features/staff/pages/BaptismPage.jsx';
 import MassIntentionsPage from './features/staff/pages/MassIntentionsPage.jsx';
+import MarriageBookingsPage from './features/staff/pages/MarriageBookingsPage.jsx';
 import ProtectedRoute from './features/auth/ProtectedRoute.jsx';
 import MarriageBookingPage from './features/certificates/pages/MarriageBookingPage.jsx';
 
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="emails" element={<EmailsPage />} />
         <Route path="baptisms" element={<BaptismsPage />} />
         <Route path="masses" element={<MassIntentionsPage />} />
+        <Route path="marriages" element={<MarriageBookingsPage />} />
         </Route>
         </Route>
       </Routes>
