@@ -40,6 +40,9 @@ export default function CertificateModal({ id, onClose }) {
             : <span className={styles.muted} style={{ fontSize: '0.8rem' }}>Available once the record is found.</span>
         ) : <>
           <button type="button" className={styles.btnGhost} onClick={() => printCertificate(certRef.current)}><i className="fa-solid fa-print" /> Print / Save as PDF</button>
+          <a className={styles.btnGhost} href={`/api/staff/requests/${id}/certificate.pdf`} target="_blank" rel="noreferrer">
+            <i className="fa-solid fa-file-pdf" /> Download PDF
+          </a>
           {digital && (ready || req.status === 'sent') && (
             <button type="button" className={styles.btn} onClick={() => setMailKind('certificate')}>
               <i className="fa-solid fa-paper-plane" /> {req.status === 'sent' ? 'Resend by email' : 'Send by email'}

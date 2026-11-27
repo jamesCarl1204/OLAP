@@ -3,6 +3,7 @@ import * as M from '../models/certificateModel.js';
 import { nextReference, REF_CODES } from '../utils/reference.js';
 import { buildBaptismPdf } from './certificatePdf.js';
 import { storeFile } from './fileStorage.js';
+import { attachPdf } from './certificatePdf.js';
 
 export class HttpError extends Error {
   constructor(status, message) { super(message); this.status = status; }
@@ -207,6 +208,11 @@ export async function runAction(id, name, body, userId) {
       throw new HttpError(409, 'This request is closed.');
     await fn(c, r, body, userId);
     await c.commit();
+
+      if (name === 'generate') {
+      try { await attachPdf(id); }
+      catch (e) { console.error('PDF generation failed', e); }
+    }
   } catch (e) {
     await c.rollback();
     throw e;

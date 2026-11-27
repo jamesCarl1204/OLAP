@@ -1,34 +1,44 @@
 import { fmtLong } from '../data/mock.js';
+import logoImg from '../../../assets/birhen.jpg';
+import signatureImg from '../../../assets/signature.jpg';
 
 const PARISH = {
   name: 'Our Lady of the Airways Parish',
   address: 'Chapel Rd. cor. Ninoy Aquino Avenue, Pasay City',
   email: 'airways_parish@yahoo.com',
   tel: '(02) 8851-4371',
-  mobile: '0956-3647788 / 0919-4639797',
+  mobile: '0956-3647788/0919-4639797',
 };
 
 const SANS = "'Plus Jakarta Sans', Arial, sans-serif";
 const S = {
   page: { width: '100%', maxWidth: '40rem', margin: '0 auto', padding: '2.5rem 2.5rem 2rem', background: '#fff', color: '#16263E', border: '6px double #B08D4F', fontFamily: "'Cormorant Garamond', Georgia, serif", textAlign: 'center', boxSizing: 'border-box' },
-  parish: { fontSize: '26px', fontWeight: 600, margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' },
+  headWrap: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px' },
+  logo: { height: '72px', width: 'auto' },
+  parish: { fontFamily: SANS, fontSize: '26px', fontWeight: 700, margin: 0 },
   addr: { fontFamily: SANS, fontSize: '11px', lineHeight: 1.7, color: '#566982' },
   title: { fontSize: '32px', fontWeight: 600, margin: '22px 0 6px', letterSpacing: '0.04em', textTransform: 'uppercase' },
   rule: { width: '80px', height: '1px', background: '#C5A467', margin: '0 auto 20px', border: 0 },
   body: { fontSize: '19px', lineHeight: 1.8, textAlign: 'justify' },
   center: { fontSize: '18px', lineHeight: 1.7, margin: '6px 0', textAlign: 'center' },
-  rite: { fontFamily: SANS, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#8F6F38', margin: '12px 0' },
-  name: { display: 'block', margin: '10px 0', fontSize: '28px', fontWeight: 700, textAlign: 'center', letterSpacing: '0.03em' },
-  row: { display: 'grid', gridTemplateColumns: '6rem 1fr', gap: '0 14px', textAlign: 'left', fontSize: '19px', margin: '2px 0 2px 2.5rem' },
-  reg: { fontSize: '16px', margin: '14px 0 4px' },
+  rite: { fontSize: '16px', textTransform: 'uppercase', margin: '12px 0', lineHeight: 1.5 },
+  name: { display: 'block', margin: '10px 0 14px', fontSize: '30px', fontWeight: 700, textAlign: 'center' },
+  row: { display: 'grid', gridTemplateColumns: '9rem 1fr', gap: '0 14px', textAlign: 'left', fontSize: '18px', margin: '4px 0' },
+  reg: { fontSize: '16px', margin: '14px 0 4px', textAlign: 'left' },
   foot: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '30px', gap: '16px', textAlign: 'left' },
   sig: { textAlign: 'center', minWidth: '12rem', fontSize: '16px' },
+  sigImg: { height: '56px', display: 'block', margin: '0 auto -18px' },
   sigLine: { borderTop: '1px solid #16263E', marginTop: '36px', paddingTop: '4px', fontWeight: 700 },
   meta: { fontFamily: SANS, fontSize: '10px', color: '#566982', lineHeight: 1.6 },
   seal: { width: '84px', height: '84px', border: '1px dashed #B08D4F', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: SANS, fontSize: '9px', color: '#8F6F38', textAlign: 'center', padding: '8px', boxSizing: 'border-box' },
 };
 
-// 1 -> 1st, 4 -> 4th, 13 -> 13th
+// absolute URL para gumana pati sa print window
+const abs = (u) => (typeof window !== 'undefined' ? new URL(u, window.location.href).href : u);
+
+// "NICANOR PIEDAD JR." -> "Nicanor Piedad Jr."
+const tc = (s) => String(s ?? '').toLowerCase().replace(/(^|[\s.-])(\p{L})/gu, (_, a, b) => a + b.toUpperCase());
+
 const ord = (n) => {
   const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
@@ -76,27 +86,67 @@ export function printCertificate(node) {
   setTimeout(() => w.print(), 700);
 }
 
-// ---- bodies ----
+// ---- shared pieces ----
+function Header({ title }) {
+  return (
+    <>
+      <div style={S.headWrap}>
+        <img src={abs(logoImg)} alt="" style={S.logo} />
+        <div>
+          <h3 style={S.parish}>{PARISH.name}</h3>
+          <div style={S.addr}>
+            {PARISH.address}<br />Email: {PARISH.email}<br />
+            Telephone: {PARISH.tel}<br />Mobile Nos. {PARISH.mobile}
+          </div>
+        </div>
+      </div>
+      <h2 style={S.title}>{title}</h2>
+      <hr style={S.rule} />
+    </>
+  );
+}
 
+function Footer({ issued, digital }) {
+  return (
+    <div style={S.foot}>
+      <div>
+        {digital ? <QrMock seed={issued.verify_token || issued.certificate_no || 'x'} /> : <div style={S.seal}>Parish dry seal</div>}
+        {digital && (
+          <div style={{ ...S.meta, marginTop: '6px' }}>
+            No. {issued.certificate_no}<br />Verification link will be available once the backend is connected.
+          </div>
+        )}
+      </div>
+      <div style={S.sig}>
+        <img src={abs(signatureImg)} alt="" style={S.sigImg} />
+        <div style={S.sigLine}>{issued.signed_by}</div>
+        <div>Parish Priest</div>
+      </div>
+    </div>
+  );
+}
+
+// ---- bodies ----
 function BaptismBody({ req, r, issued }) {
-  const sponsors = r.sponsors?.length ? joinList(r.sponsors) : '—';
+  const sponsors = r.sponsors?.length ? joinList(r.sponsors.map(tc)) : '—';
   return (
     <>
       <p style={S.center}>This is to certify that</p>
-      <span style={S.name}>{r.full_name || req.subject_name}</span>
-      <div style={S.row}><span>Child of</span><b>{r.father_name || req.father_name || '—'}</b></div>
-      <div style={S.row}><span>And</span><b>{r.mother_name || req.mother_name || '—'}</b></div>
-      <div style={S.row}><span>born in</span><b>{r.birth_place || req.birth_place || '—'}</b></div>
+      <span style={S.name}>{(r.full_name || req.subject_name || '').toUpperCase()}</span>
+      <div style={S.row}><span>Child of</span><b>{tc(r.father_name || req.father_name) || '—'}</b></div>
+      <div style={S.row}><span>And</span><b>{tc(r.mother_name || req.mother_name) || '—'}</b></div>
+      <div style={S.row}><span>born in</span><b>{tc(r.birth_place || req.birth_place) || '—'}</b></div>
       <div style={S.row}><span>on the</span><b>{dayOf(r.birth_date || req.birth_date)}</b></div>
-      <p style={S.center}>was solemnly Baptized on the <b>{dayOf(r.event_date || req.event_date)}</b></p>
-      <div style={S.rite}>According to the Rite of the Roman Catholic Church</div>
-      <p style={S.center}>By the Rev. <b>{r.officiant || '—'}</b></p>
-      <p style={S.center}>the sponsors being: <b>{sponsors}</b></p>
-      <p style={S.center}>as appears on the Baptismal Register of this Church.</p>
+      <p style={S.center}>was solemnly Baptized</p>
+      <div style={S.row}><span>on the</span><b>{dayOf(r.event_date || req.event_date)}</b></div>
+      <div style={S.rite}>According to the Rite of the<br />Roman Catholic Church</div>
+      <div style={S.row}><span>By the Rev.</span><b>{tc(r.officiant) || '—'}</b></div>
+      <div style={S.row}><span>the sponsors being:</span><span>{sponsors}</span></div>
+      <p style={{ ...S.reg, marginTop: '40px' }}>as appears on the Baptismal Register of this Church.</p>
       <p style={S.reg}>
         Bk. No.: <b>{r.book_no || '—'}</b> &nbsp; Page No.: <b>{r.page_no || '—'}</b> &nbsp; Line No.: <b>{r.line_no || '—'}</b> &nbsp; Date: <b>{fmtLong(issued.issued_at)}</b>
       </p>
-      <p style={{ ...S.center, textAlign: 'left' }}>Purpose: <b>FOR {String(req.purpose || '').toUpperCase()}</b></p>
+      <p style={{ ...S.reg, margin: 0 }}>Purpose: <b>FOR {String(req.purpose || '').toUpperCase()}</b></p>
     </>
   );
 }
@@ -110,10 +160,10 @@ function ConfirmationBody({ req, r, issued }) {
     <>
       <p style={S.body}>
         This is to certify that
-        <span style={S.name}>{r.full_name || req.subject_name}</span>
-        {father || mother ? <>child of <b>{father || '—'}</b> and <b>{mother || '—'}</b>, </> : null}
+        <span style={S.name}>{(r.full_name || req.subject_name || '').toUpperCase()}</span>
+        {father || mother ? <>child of <b>{tc(father) || '—'}</b> and <b>{tc(mother) || '—'}</b>, </> : null}
         received the Sacrament of Confirmation{eventDate ? <> on the <b>{dayOf(eventDate)}</b></> : null}
-        {r.officiant ? <> by <b>{r.officiant}</b></> : null}, as recorded in the Confirmation Register,
+        {r.officiant ? <> by <b>{tc(r.officiant)}</b></> : null}, as recorded in the Confirmation Register,
         {' '}Book <b>{r.book_no || '—'}</b>, Page <b>{r.page_no || '—'}</b>, Line <b>{r.line_no || '—'}</b>.
       </p>
       <p style={{ ...S.body, textAlign: 'center', fontSize: '16px' }}>
@@ -123,131 +173,50 @@ function ConfirmationBody({ req, r, issued }) {
   );
 }
 
-function NoRecordBody({ req, issued, kind }) {
-  const baptism = kind === 'baptism';
+function NoRecordBody({ req, issued }) {
+  const baptism = req.certificate_type === 'no_record_baptism';
+  const record = baptism ? 'BAPTISMAL' : 'CONFIRMATION';
+  const verb = baptism ? 'BAPTIZED' : 'CONFIRMED';
+  const sacrament = baptism ? 'BAPTISM' : 'CONFIRMATION';
+  const parents = req.father_name || req.mother_name;
   return (
     <>
       <p style={{ ...S.body, textAlign: 'left', fontWeight: 700 }}>To Whom It May Concern:</p>
       <p style={S.body}>
-        This is to certify that the <b>{baptism ? 'BAPTISMAL' : 'CONFIRMATION'} RECORD</b> of <b>{req.subject_name}</b>
-        {' '}child of <b>{req.father_name}</b> and <b>{req.mother_name}</b>
-        {req.birth_date ? <>, alleged to have been born on <b>{fmtLong(req.birth_date)}</b>{req.birth_place ? <> in <b>{req.birth_place}</b></> : null},</> : null}
-        {' '}was not <b>{baptism ? 'BAPTIZED' : 'CONFIRMED'}</b> in our parish and cannot be found in the records of this office despite diligent and thorough research.
+        This is to certify that the <b>{record} RECORD</b> of
+        <span style={S.name}>{req.subject_name}</span>
+        {parents && <>child of <b>{tc(req.father_name) || '—'}</b> and <b>{tc(req.mother_name) || '—'}</b>, </>}
+        {req.birth_date && <>alleged to have been born on <b>{fmtLong(req.birth_date)}</b>{req.birth_place ? <> in <b>{tc(req.birth_place)}</b></> : null}, </>}
+        was <b>not {verb}</b> in our parish and cannot be found in the records of this office despite diligent and thorough research.
       </p>
       <p style={S.body}>
-        In view of the foregoing, this office cannot issue the <b>{baptism ? 'BAPTISMAL' : 'CONFIRMATION'} CERTIFICATE</b> of <b>{req.subject_name}</b> as partial requirement in{' '}
-        <b>{req.destination_church}{req.destination_city ? `, ${req.destination_city}` : ''}</b> for <b>{baptism ? 'BAPTISM' : 'CONFIRMATION'}</b>.
-        {' '}Given this <b>{dayOf(issued.issued_at)}</b>.
+        In view of the foregoing, this office cannot issue a certificate of {sacrament.toLowerCase()} for <b>{req.subject_name}</b> as
+        partial requirement in <b>{tc(req.destination_church)}{req.destination_city ? `, ${tc(req.destination_city)}` : ''}</b> for <b>{sacrament}</b>.
+      </p>
+      <p style={{ ...S.body, textAlign: 'center', fontSize: '16px' }}>
+        Given this <b>{dayOf(issued.issued_at)}</b>.
       </p>
     </>
   );
 }
 
-const ordinal = (n) => {
-  const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
-};
-
-function NoRecordCertificate({ req, issued, innerRef }) {
-  const isBaptism = req.certificate_type === 'no_record_baptism';
-  const digital = req.format === 'digital';
-  const record = isBaptism ? 'BAPTISMAL' : 'CONFIRMATION';
-  const verb = isBaptism ? 'BAPTIZED' : 'CONFIRMED';
-  const sacrament = isBaptism ? 'BAPTISM' : 'CONFIRMATION';
-  const given = new Date(issued.issued_at);
-  const month = given.toLocaleDateString('en-PH', { month: 'long' });
-  const parents = req.father_name || req.mother_name;
-
-  return (
-    <div ref={innerRef} style={S.page}>
-      <div style={S.small}>Archdiocese · Parish Registry</div>
-      <h3 style={S.parish}>Our Lady of the Airways Parish</h3>
-      <div style={{ ...S.meta, marginTop: '4px' }}>
-        Chapel Rd. cor. Ninoy Aquino Avenue, Pasay City<br />
-        Email: airways_parish@yahoo.com · Tel: (02) 8851-4371<br />
-        Mobile: 0956-3647788 / 0919-4639797
-      </div>
-      <h2 style={{ ...S.title, fontSize: '30px' }}>Certificate of No Record</h2>
-      <hr style={S.rule} />
-
-      <p style={{ ...S.body, textAlign: 'left', fontWeight: 700 }}>To Whom It May Concern:</p>
-      <p style={S.body}>
-        This is to certify that the <b>{record} RECORD</b> of
-        <span style={S.name}>{req.subject_name}</span>
-        {parents && <>child of <b>{req.father_name || '—'}</b> and <b>{req.mother_name || '—'}</b>, </>}
-        {req.birth_date && <>alleged to have been born on <b>{fmtLong(req.birth_date)}</b>{req.birth_place ? <> in <b>{req.birth_place}</b></> : null}, </>}
-        was <b>not {verb}</b> in our parish and cannot be found in the records of this office despite diligent and thorough research.
-      </p>
-      <p style={S.body}>
-        In view of the foregoing, this office cannot issue a certificate of {sacrament.toLowerCase()} for <b>{req.subject_name}</b> as
-        partial requirement in <b>{req.destination_church}{req.destination_city ? `, ${req.destination_city}` : ''}</b> for <b>{sacrament}</b>.
-      </p>
-      <p style={{ ...S.body, textAlign: 'center', fontSize: '16px' }}>
-        Given this <b>{ordinal(given.getDate())}</b> day of <b>{month}, {given.getFullYear()}</b>.
-      </p>
-
-      <div style={S.foot}>
-        <div>
-          {digital ? <QrMock seed={issued.verify_token || issued.certificate_no || 'x'} /> : <div style={S.seal}>Parish dry seal</div>}
-          {digital && (
-            <div style={{ ...S.meta, marginTop: '6px' }}>
-              No. {issued.certificate_no}<br />Verification link will be available once the backend is connected.
-            </div>
-          )}
-        </div>
-        <div style={S.sig}>
-          <div style={S.sigLine}>{issued.signed_by}</div>
-          <div>Parish Priest</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Certificate({ req, record, issued, innerRef }) {
-  if (req.certificate_type.startsWith('no_record')) {
-    return <NoRecordCertificate req={req} issued={issued} innerRef={innerRef} />;
-  }
-  const isBaptism = req.certificate_type === 'baptismal';
-  const digital = req.format === 'digital';
-  const r = record || {};
   const type = req.certificate_type; // baptismal | confirmation | no_record_baptism | no_record_confirmation
   const noRecord = type.startsWith('no_record');
   const kind = type.includes('baptism') ? 'baptism' : 'confirmation';
+  const digital = req.format === 'digital';
+  const r = record || {};
   const title = noRecord ? 'Certificate of No Record' : kind === 'baptism' ? 'Certificate of Baptism' : 'Certificate of Confirmation';
 
   return (
     <div ref={innerRef} style={S.page}>
-      <h3 style={S.parish}>{PARISH.name}</h3>
-      <div style={S.addr}>
-        {PARISH.address}<br />
-        Email: {PARISH.email}<br />
-        Telephone: {PARISH.tel}<br />
-        Mobile Nos.: {PARISH.mobile}
-      </div>
-      <h2 style={S.title}>{title}</h2>
-      <hr style={S.rule} />
-
+      <Header title={title} />
       {noRecord
-        ? <NoRecordBody req={req} issued={issued} kind={kind} />
+        ? <NoRecordBody req={req} issued={issued} />
         : kind === 'baptism'
           ? <BaptismBody req={req} r={r} issued={issued} />
           : <ConfirmationBody req={req} r={r} issued={issued} />}
-
-      <div style={S.foot}>
-        <div>
-          {digital ? <QrMock seed={issued.verify_token || issued.certificate_no || 'x'} /> : <div style={S.seal}>Parish dry seal</div>}
-          {digital && (
-            <div style={{ ...S.meta, marginTop: '6px' }}>
-              No. {issued.certificate_no}<br />Verification link will be available once the backend is connected.
-            </div>
-          )}
-        </div>
-        <div style={S.sig}>
-          <div style={S.sigLine}>{issued.signed_by}</div>
-          <div>Parish Priest</div>
-        </div>
-      </div>
+      <Footer issued={issued} digital={digital} />
     </div>
   );
 }
