@@ -72,3 +72,38 @@ export async function createBaptismRegistration({ type, code, data, sponsors, do
     c.release();
   }
 }
+
+export async function listBaptismRows() {
+  const [rows] = await pool.query(
+    `SELECT b.*, t.code AS type_code,
+            p.method AS pay_method, p.status AS pay_status, p.sender_gcash_number, p.sender_account_name,
+            p.reject_reason AS pay_reject_reason,
+            f.id AS proof_id, f.original_name AS proof_name, f.mime_type AS proof_mime,
+            f.size_bytes AS proof_size, f.uploaded_at AS proof_uploaded_at
+     FROM baptism_registrations b
+     JOIN baptism_types t ON t.id = b.baptism_type_id
+     LEFT JOIN payments p ON p.baptism_id = b.id
+     LEFT JOIN files f ON f.id = p.proof_file_id
+     ORDER BY b.submitted_at DESC`);
+  return rows;
+}
+
+export async function listSponsorRows() {
+  const [rows] = await pool.query('SELECT baptism_id, full_name, address FROM baptism_sponsors ORDER BY baptism_id, position');
+  return rows;
+}
+
+export async function listDocumentRows() {
+  const [rows] = await pool.query(
+    `SELECT d.baptism_id, d.doc_type, f.id AS file_id, f.original_name
+     FROM baptism_documents d JOIN files f ON f.id = d.file_id`);
+  return rows;
+}
+
+export async function listBaptismEvents() {
+  const [rows] = await pool.query(
+    `SELECT e.baptism_id AS ref_id, e.note, e.created_at, u.full_name
+     FROM request_events e LEFT JOIN users u ON u.id = e.actor_user_id
+     WHERE e.baptism_id IS NOT NULL ORDER BY e.created_at, e.id`);
+  return rows;
+}

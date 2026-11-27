@@ -47,3 +47,49 @@ export async function createCertificateRequest({ type, code, person, contact, pa
     c.release();
   }
 }
+
+export async function listRequestRows() {
+  const [rows] = await pool.query(
+    `SELECT r.*, p.method AS pay_method, p.status AS pay_status,
+            p.sender_gcash_number, p.sender_account_name, p.reject_reason AS pay_reject_reason,
+            f.id AS proof_id, f.original_name, f.mime_type, f.size_bytes, f.uploaded_at AS proof_uploaded_at,
+            (SELECT COUNT(*) FROM files f2 WHERE f2.sha256 = f.sha256 AND f2.id <> f.id) AS proof_dupes,
+            (SELECT COUNT(*) FROM certificate_requests x
+              WHERE x.id <> r.id AND x.certificate_type = r.certificate_type
+                AND x.subject_name = r.subject_name AND x.contact_email = r.contact_email
+                AND x.status <> 'rejected') AS dupes
+     FROM certificate_requests r
+     LEFT JOIN payments p ON p.request_id = r.id
+     LEFT JOIN files f ON f.id = p.proof_file_id
+     ORDER BY r.submitted_at DESC`);
+  return rows;
+}
+
+export async function listRequestEvents() {
+  const [rows] = await pool.query(
+    `SELECT e.request_id AS ref_id, e.note, e.created_at, u.full_name
+     FROM request_events e LEFT JOIN users u ON u.id = e.actor_user_id
+     WHERE e.request_id IS NOT NULL ORDER BY e.created_at, e.id`);
+  return rows;
+}
+
+export async function listIssuedRows() {
+  const [rows] = await pool.query('SELECT * FROM issued_certificates WHERE revoked_at IS NULL ORDER BY id');
+  return rows;
+}
+
+export async function listLinkedRecords() {
+  const [rows] = await pool.query(
+    `SELECT r.id AS request_id, g.* FROM certificate_requests r
+     JOIN registry_records g ON g.id = r.registry_record_id`);
+  return rows;
+}
+
+export async function listEmailRows() {
+  const [rows] = await pool.query(
+    `SELECT o.id, o.request_id, c.reference_no, o.to_email, o.template_key, o.subject,
+            o.status, o.attempts, o.last_error, o.queued_at
+     FROM email_outbox o JOIN certificate_requests c ON c.id = o.request_id
+     ORDER BY o.queued_at DESC, o.id DESC`);
+  return rows;
+}

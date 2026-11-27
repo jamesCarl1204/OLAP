@@ -3,7 +3,7 @@ import { bad, text, upper, PHONE, EMAIL, validDate, localToday, sniff } from '..
 import { findActiveType, createMassIntention } from '../models/massModel.js';
 import { storeFile, removeStored } from './fileStorage.js';
 
-const PAY_METHODS = ['gcash', 'cash'];
+const PAY_METHODS = ['gcash', 'pickup'];
 const CONSENT_VERSION = 'v1';
 
 // TODO: Mass times are still placeholders in the frontend, so the time is only length-checked.

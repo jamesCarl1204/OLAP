@@ -50,3 +50,26 @@ export async function createMassIntention({ type, code, data, proof, payment, co
     c.release();
   }
 }
+
+export async function listMassRows() {
+  const [rows] = await pool.query(
+    `SELECT m.*, t.code AS type_code,
+            p.method AS pay_method, p.status AS pay_status, p.gcash_reference_no,
+            p.reject_reason AS pay_reject_reason,
+            f.id AS proof_id, f.original_name AS proof_name, f.mime_type AS proof_mime,
+            f.size_bytes AS proof_size, f.uploaded_at AS proof_uploaded_at
+     FROM mass_intentions m
+     JOIN mass_intention_types t ON t.id = m.mass_type_id
+     LEFT JOIN payments p ON p.mass_id = m.id
+     LEFT JOIN files f ON f.id = p.proof_file_id
+     ORDER BY m.submitted_at DESC`);
+  return rows;
+}
+
+export async function listMassEvents() {
+  const [rows] = await pool.query(
+    `SELECT e.mass_id AS ref_id, e.note, e.created_at, u.full_name
+     FROM request_events e LEFT JOIN users u ON u.id = e.actor_user_id
+     WHERE e.mass_id IS NOT NULL ORDER BY e.created_at, e.id`);
+  return rows;
+}

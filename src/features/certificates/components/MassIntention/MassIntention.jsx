@@ -222,12 +222,11 @@ export default function MassIntention() {
 
           <p className={base.lead}>Choose how you will give your offering. {MASS_OFFERING_NOTE}</p>
 
-          <label className={`${base.option} ${pay.method === 'gcash' ? base.picked : ''}`}>
-            <input type="radio" name="method" value="gcash" checked={pay.method === 'gcash'} onChange={setPayField} />
-            <span className={base.optIcon}><i className="fa-solid fa-mobile-screen" /></span>
-            <span className={base.optText}><strong>GCash</strong><small>Send the offering to the parish GCash account, then upload your receipt.</small></span>
-            <span className={base.tag}>Online payment</span>
-          </label>
+          <label className={`${base.option} ${pay.method === 'pickup' ? base.picked : ''}`}>
+           <input type="radio" name="method" value="pickup" checked={pay.method === 'pickup'} onChange={setPayField} />
+           <span className={base.optIcon}><i className="fa-solid fa-hand-holding-dollar" /></span>
+           <span className={base.optText}><strong>Pay at the Parish Office</strong><small>Pay the offering directly to the authorized parish staff.</small></span>
+         </label>
           <label className={`${base.option} ${pay.method === 'cash' ? base.picked : ''}`}>
             <input type="radio" name="method" value="cash" checked={pay.method === 'cash'} onChange={setPayField} />
             <span className={base.optIcon}><i className="fa-solid fa-hand-holding-dollar" /></span>
@@ -245,7 +244,7 @@ export default function MassIntention() {
               <Field label="GCash payment receipt (screenshot)" type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={onProof} hint="JPG, PNG, or PDF. Max 5 MB. Staff will verify your payment." required />
             </fieldset>
           )}
-          {pay.method === 'cash' && (
+          {pay.method === 'pickup' && (
             <p className={own.panel}>Proceed to the Parish Office and pay the offering to the authorized staff. They will record and confirm your payment in the system.</p>
           )}
 
