@@ -1,8 +1,6 @@
 import crypto from 'node:crypto';
 import * as M from '../models/certificateModel.js';
 import { nextReference, REF_CODES } from '../utils/reference.js';
-import { buildBaptismPdf } from './certificatePdf.js';
-import { storeFile } from './fileStorage.js';
 import { attachPdf } from './certificatePdf.js';
 
 export class HttpError extends Error {
@@ -124,6 +122,7 @@ const ACTIONS = {
     await move(c, r, 'ready', u, 'No record found. Ready to generate.');
   },
 
+  // Saves the issued certificate + snapshot. The PDF is built by attachPdf() after the commit (see runAction).
   async generate(c, r, b, u) {
     need(r.status === 'ready', 'The certificate can only be generated when the request is ready.');
     need(['verified', 'paid_on_pickup'].includes(r.pay_status), 'The payment is not verified.');
@@ -148,21 +147,6 @@ const ACTIONS = {
       record,
     };
     await M.insertIssued(c, { requestId: r.id, certificateNo, token, snapshot, signedBy, userId: u });
-
-    // PDF (baptismal muna)
-    if (r.certificate_type === 'baptismal' && record) {
-      const pdf = await buildBaptismPdf({
-        record: { ...record, sponsors: record.sponsors ? record.sponsors.split(';').map((s) => s.trim()).filter(Boolean) : [] },
-        issued: { issued_at: new Date(), signed_by: signedBy },
-        purpose: r.purpose,
-      });
-      const f = await storeFile(
-        { buffer: pdf, originalname: `${certificateNo || r.reference_no}.pdf`, size: pdf.length },
-        { ext: 'pdf', mime: 'application/pdf' }, 'certificates');
-      const fileId = await M.insertFile(c, f);
-      await M.setIssuedPdf(c, r.id, fileId);
-    }
-
     await M.logEvent(c, r.id, u, 'issued', null, null, digital ? `E-certificate ${certificateNo} generated.` : 'Certificate generated for printing.');
   },
 
@@ -208,15 +192,16 @@ export async function runAction(id, name, body, userId) {
       throw new HttpError(409, 'This request is closed.');
     await fn(c, r, body, userId);
     await c.commit();
-
-      if (name === 'generate') {
-      try { await attachPdf(id); }
-      catch (e) { console.error('PDF generation failed', e); }
-    }
   } catch (e) {
     await c.rollback();
     throw e;
   } finally {
     c.release();
+  }
+
+  // After the commit, so a PDF problem never undoes the issued certificate.
+  if (name === 'generate') {
+    try { await attachPdf(id); }
+    catch (e) { console.error('PDF generation failed', e); }
   }
 }

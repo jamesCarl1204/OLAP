@@ -19,6 +19,9 @@ function KV({ label, value }) {
   return <div><small>{label}</small><strong>{value || '—'}</strong></div>;
 }
 
+function checklistFor() { return null; }
+function SubmissionReview() { return null; }
+
 export default function RequestDetailPage() {
   const { id } = useParams();
   const rid = Number(id);

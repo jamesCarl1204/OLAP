@@ -49,10 +49,10 @@ export async function listRequestsForStaff() {
     listRequestRows(), listRequestEvents(), listIssuedRows(), listLinkedRecords(), listEmailRows(),
   ]);
 
-  const issued = {};
+    const issued = {};
   for (const i of iss) issued[i.request_id] = {
     certificate_no: i.certificate_no, verify_token: i.verify_token, signed_by: i.signed_by, issued_at: i.issued_at,
-    pdf_url: i.pdf_file_id ? fileUrl(i.pdf_file_id) : null,
+    pdf_url: i.pdf_storage_key ? `/api/staff/requests/${i.request_id}/certificate.pdf` : null,
   };
 
   const records = {};

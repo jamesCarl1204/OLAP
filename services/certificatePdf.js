@@ -73,7 +73,12 @@ export async function buildBaptismPdf(snapshot, issued) {
   row('on the', dayOf(r.event_date || q.event_date));
   mid('ACCORDING TO THE RITE OF THE\nROMAN CATHOLIC CHURCH');
   row('By the Rev.', title(r.officiant) || '—');
-  const sponsors = r.sponsors?.length ? joinList(r.sponsors.map(title)) : '—';
+
+  // sponsors can be an array or a "A;B;C" string from the DB
+  const list = Array.isArray(r.sponsors)
+    ? r.sponsors
+    : String(r.sponsors || '').split(';').map((s) => s.trim()).filter(Boolean);
+  const sponsors = list.length ? joinList(list.map(title)) : '—';
   const y = doc.y;
   doc.font('Times-Roman').text('the sponsors being:', L, y, { width: V - L + 20 });
   doc.text(sponsors, V + 20, y, { width: L + W - V - 20 });
@@ -93,7 +98,7 @@ export async function buildBaptismPdf(snapshot, issued) {
   const sy = Math.max(doc.y + 30, 640);
   const sig = asset('signature.png');
   if (sig) doc.image(sig, 330, sy - 40, { width: 170 });
-  doc.font('Times-Bold').fontSize(13).text(issued.signed_by.replace(/^REV\.\s*/i, 'Rev. '), 300, sy + 10, { width: W - 244 + 56, align: 'center' });
+  doc.font('Times-Bold').fontSize(13).text(String(issued.signed_by || '').replace(/^REV\.\s*/i, 'Rev. '), 300, sy + 10, { width: W - 244 + 56, align: 'center' });
   doc.font('Times-Roman').fontSize(12).text('Parish Priest', 300, doc.y, { width: W - 244 + 56, align: 'center' });
 
   doc.end();
